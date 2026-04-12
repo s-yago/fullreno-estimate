@@ -241,8 +241,8 @@ var K_BASE_AREA = 105, K_MIN_AREA = 85, K_BASE_TOTAL = 13600000, K_UNIT = 70000;
 // locked=true: 必須（チェック不可）
 var mansionPack = [
   {id:'m01', label:'解体・撤去・産廃処理工事', type:'fix', base:900000, locked:true},
-  {id:'m02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:894000, locked:false},
-  {id:'m03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:854000, locked:false},
+  {id:'m02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:1008000, deduct:589500, locked:false},
+  {id:'m03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:831000, deduct:486000, locked:false},
   {id:'m04', label:'洗面台新規設置工事', type:'fix', base:243000, locked:false},
   {id:'m05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:151000, locked:false},
   {id:'m06', label:'給湯器（20号）工事', type:'fix', base:227200, locked:false},
@@ -265,50 +265,50 @@ var mansionPack = [
 
 // ===== 戸建て パック工事 =====
 var kodatePack = [
-  {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1200000, locked:true},
-  {id:'k02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:894000, locked:false},
-  {id:'k03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:854000, locked:false},
-  {id:'k04', label:'洗面台新規設置工事', type:'fix', base:243000, locked:false},
-  {id:'k05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:151000, locked:false},
-  {id:'k06', label:'給湯器（20号）工事', type:'fix', base:227200, locked:false},
-  {id:'k07', label:'給排水・ガス配管工事', type:'fix', base:700000, locked:true},
-  {id:'k08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:1250000, baseArea:105, unit:9000, locked:false},
-  {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1100000, baseArea:105, unit:5400, locked:false},
-  {id:'k10', label:'電気工事（配線・分電盤・コンセント増設）', type:'fix', base:500000, locked:true},
-  {id:'k11', label:'照明器具取付工事', type:'fix', base:454500, locked:false},
-  {id:'k12', label:'建具全箇所交換工事', type:'fix', base:454500, locked:false},
-  {id:'k13', label:'換気扇交換（水回りのみ）', type:'fix', base:60600, locked:false},
-  {id:'k14', label:'畳表替え（固定）', type:'fix', base:60600, locked:false},
-  {id:'k15', label:'ふすま・障子張替工事', type:'fix', base:75800, locked:false},
-  {id:'k16', label:'網戸交換', type:'fix', base:45400, locked:false},
-  {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:45400, locked:false},
-  {id:'k18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:480000, locked:false},
-  {id:'k19', label:'内窓設置（4か所）', type:'fix', base:484800, locked:false},
-  {id:'k20', label:'ハウスクリーニング', type:'fix', base:227200, locked:true},
-  {id:'k21', label:'外壁塗装工事（120㎡まで）', type:'fix', base:770000, locked:false},
-  {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:920000, locked:false},
-  {id:'k23', label:'足場設置・撤去費', type:'fix', base:770000, locked:false},
-  {id:'k24', label:'ペアガラス内窓設置（8か所）', type:'fix', base:856000, locked:false},
-  {id:'k25', label:'養生費', type:'fix', base:106000, locked:true},
+  {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1200000, deduct:1200000, locked:true},
+  {id:'k02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:894000, deduct:522900, locked:false},
+  {id:'k03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:854000, deduct:499500, locked:false},
+  {id:'k04', label:'洗面台新規設置工事', type:'fix', base:243000, deduct:142200, locked:false},
+  {id:'k05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:151000, deduct:88200, locked:false},
+  {id:'k06', label:'給湯器（20号）工事', type:'fix', base:227200, deduct:150000, locked:false},
+  {id:'k07', label:'給排水・ガス配管工事', type:'fix', base:700000, deduct:700000, locked:true},
+  {id:'k08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:1250000, deduct:822600, baseArea:105, unit:9000, unitDeduct:6000, locked:false},
+  {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1100000, deduct:1087650, baseArea:105, unit:5400, unitDeduct:11500, locked:false},
+  {id:'k10', label:'電気工事（配線・分電盤・コンセント増設）', type:'fix', base:500000, deduct:500000, locked:true},
+  {id:'k11', label:'照明器具取付工事', type:'fix', base:454500, deduct:300000, locked:false},
+  {id:'k12', label:'建具全箇所交換工事', type:'fix', base:454500, deduct:500000, locked:false},
+  {id:'k13', label:'換気扇交換（水回りのみ）', type:'fix', base:60600, deduct:40000, locked:false},
+  {id:'k14', label:'畳表替え（固定）', type:'fix', base:60600, deduct:40000, locked:false},
+  {id:'k15', label:'ふすま・障子張替工事', type:'fix', base:75800, deduct:50000, locked:false},
+  {id:'k16', label:'網戸交換', type:'fix', base:45400, deduct:30000, locked:false},
+  {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:45400, deduct:30000, locked:false},
+  {id:'k18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:480000, deduct:350000, locked:false},
+  {id:'k19', label:'内窓設置（4か所）', type:'fix', base:484800, deduct:320000, locked:false},
+  {id:'k20', label:'ハウスクリーニング', type:'fix', base:227200, deduct:150000, locked:true},
+  {id:'k21', label:'外壁塗装工事（120㎡まで）', type:'fix', base:770000, deduct:500000, locked:false},
+  {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:920000, deduct:600000, locked:false},
+  {id:'k23', label:'足場設置・撤去費', type:'fix', base:770000, deduct:500000, locked:false},
+  {id:'k24', label:'ペアガラス内窓設置（8か所）', type:'fix', base:856000, deduct:640000, locked:false},
+  {id:'k25', label:'養生費', type:'fix', base:106000, deduct:106000, locked:true},
 ];
 
 // ===== 追加工事 =====
 var addData = [
   {group:'マンション・戸建て共通', items:[
-    {id:'a01', label:'エアコン設置工事（追加）', price:550000, qty:false},
-    {id:'a02', label:'畳表替え工事（8帖まで・追加）', price:60000, qty:false},
+    {id:'a01', label:'エアコン設置工事・追加（6帖タイプ）', price:100000, qty:true, unit:'台'},
+    {id:'a02', label:'畳表替え工事（8帖まで・追加）', price:60000, qty:true, unit:'部屋'},
     {id:'a03', label:'ふすま・障子張替工事（追加）', price:60000, qty:false},
     {id:'a04', label:'カギ交換（上下2か所）（追加）', price:40000, qty:true, unit:'か所'},
     {id:'a05', label:'コンセント移設・増設', price:30000, qty:true, unit:'箇所'},
     {id:'a06', label:'エアコン用コンセント新設', price:40000, qty:true, unit:'箇所'},
-    {id:'a07', label:'床暖房設置工事', price:300000, qty:false},
+    {id:'a07', label:'床暖房設置工事', price:500000, qty:false},
     {id:'a08', label:'浴室暖房乾燥機（UB交換の場合）', price:70000, qty:false},
     {id:'a09', label:'ビルトイン食洗機（キッチン交換の場合）', price:100000, qty:false},
   ]},
   {group:'戸建て専用追加', items:[
     {id:'a10', label:'2階トイレ工事（1階トイレ交換の場合）', price:170000, qty:false},
-    {id:'a11', label:'外壁塗装追加（120㎡超過分）', price:0, qty:false},
-    {id:'a12', label:'屋根塗装追加（70㎡超過分）', price:0, qty:false},
+    {id:'a11', label:'外壁塗装追加（120㎡超過分）', price:5000, qty:true, unit:'㎡'},
+    {id:'a12', label:'屋根塗装追加（70㎡超過分）', price:10000, qty:true, unit:'㎡'},
   ]},
 ];
 
@@ -329,12 +329,15 @@ function getFloorArea(){
   return Math.max(raw, K_MIN_AREA);
 }
 
-function calcItemPrice(item, area){
-  var diff = area - item.baseArea;
-  if(item.type==='fix') return item.base;
-  if(item.type==='var_sqm') return Math.round(item.base + diff * item.unit);
-  if(item.type==='var_5sqm') return Math.round(item.base + (diff/5) * item.unit);
-  return item.base;
+function calcItemPrice(item, area, useDeduct){
+  // useDeduct=true: 減額金額を返す / false: 実際工事費を返す
+  var base = useDeduct ? (item.deduct || item.base) : item.base;
+  var unit = useDeduct ? (item.unitDeduct || item.unit || 0) : (item.unit || 0);
+  var diff = item.baseArea ? (area - item.baseArea) : 0;
+  if(item.type==='fix') return base;
+  if(item.type==='var_sqm') return Math.round(base + diff * unit);
+  if(item.type==='var_5sqm') return Math.round(base + (diff/5) * unit);
+  return base;
 }
 
 function getBaseTotal(area){
@@ -428,13 +431,14 @@ function recalc(){
   // 除外工事の減額計算
   var deductTotal = 0;
   pack.forEach(function(item){
-    var price = calcItemPrice(item, area);
+    var priceActual = calcItemPrice(item, area, false);
+    var priceDeduct = calcItemPrice(item, area, true);
     var isLocked = locked.indexOf(item.id) !== -1;
     var priceEl = document.getElementById('pkp_'+item.id);
-    if(priceEl) priceEl.textContent = fmt(price) + ' 円';
+    if(priceEl) priceEl.textContent = fmt(priceDeduct) + ' 円';
     if(!isLocked){
       var el = document.getElementById('pk_'+item.id);
-      if(el && !el.checked) deductTotal += price;
+      if(el && !el.checked) deductTotal += priceDeduct;
     }
   });
 
