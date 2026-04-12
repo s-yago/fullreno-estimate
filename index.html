@@ -65,8 +65,33 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 .notes p::before{content:"※ "}
 .warn-note{background:#fff3e0;border:1px solid #ffcc02;color:#e65100;font-weight:600}
 .warn-note p::before{content:"⚠ "}
+.save-bar{display:flex;gap:6px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
+.save-bar button{padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer}
+.btn-save{background:#1a3a6b;color:#fff}
+.btn-overwrite{background:#2e7d32;color:#fff}
+.btn-altname{background:#4a7ab5;color:#fff}
+.btn-history{background:#555;color:#fff}
+.btn-new{background:#888;color:#fff}
+.current-name{font-size:11px;color:#1a3a6b;background:#eef3fb;border:1px solid #b0c8e8;border-radius:4px;padding:4px 10px;font-weight:600}
+.modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:10px;padding:24px;width:440px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.modal h3{font-size:14px;font-weight:700;margin-bottom:12px;color:#1a3a6b}
+.modal input[type=text]{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;margin-bottom:14px}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:9px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700}
+.btn-ok{background:#1a3a6b;color:#fff}
+.btn-cancel{background:#888;color:#fff}
+.history-list{overflow-y:auto;flex:1;margin-bottom:12px}
+.history-item{border:1px solid #ddd;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fafafa}
+.history-item-name{font-weight:700;font-size:12px;color:#1a3a6b;margin-bottom:2px}
+.history-item-date{font-size:10px;color:#888;margin-bottom:8px}
+.history-item-btns{display:flex;gap:6px}
+.history-item-btns button{flex:1;padding:5px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer}
+.btn-load{background:#1a3a6b;color:#fff}
+.btn-del{background:#eee;color:#888;border:1px solid #ccc!important}
+.btn-del-confirm{background:#8b0000;color:#fff}
 @media print{
-  .btn-back,.btn-estimate,.btn-print,.no-print{display:none!important}
+  .btn-back,.btn-estimate,.btn-print,.no-print,.save-bar,.modal-bg{display:none!important}
   body{background:white;padding:0}
   .page.active{display:block!important}
 }
@@ -80,6 +105,13 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
     <div class="tabs no-print">
       <button class="tab active" id="tab-mansion" onclick="setTab('mansion')">🏢 マンション</button>
       <button class="tab" id="tab-kodate" onclick="setTab('kodate')">🏠 戸建て</button>
+    </div>
+
+    <!-- 保存バー -->
+    <div class="save-bar no-print" id="saveBar">
+      <button class="btn-save" id="btnSave" onclick="openSaveDialog()">💾 保存</button>
+      <button class="btn-history" onclick="openHistory()">📂 履歴 (<span id="historyCount">0</span>)</button>
+      <button class="btn-new" onclick="newCase()">＋ 新規</button>
     </div>
 
     <div class="base-info">
@@ -143,10 +175,22 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
       <div class="total-row kodate-only"><span>戸建て専用除外（減額）</span><span class="price-red" id="t-kodate-deduct">0 円</span></div>
       <div class="total-row"><span>追加工事費</span><span class="price-grn" id="t-add">0 円</span></div>
       <div class="total-row"><span>その他工事費</span><span class="price-grn" id="t-other">0 円</span></div>
-      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px"><span style="font-weight:600">調整費合計（内訳合計＝総額に自動調整）</span><span class="price-gray" id="t-adjust">0 円</span></div>
+      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px"><span style="font-weight:600">調整費合計（内訳合計＝工事費に自動調整）</span><span class="price-gray" id="t-adjust">0 円</span></div>
       <div class="total-row adjust"><span>└ 現場管理費・諸経費</span><span class="price-gray" id="t-adj1">0 円</span></div>
       <div class="total-row adjust"><span>└ 設計・監理費</span><span class="price-gray" id="t-adj2">0 円</span></div>
       <div class="total-row adjust"><span>└ 工事保険料・経費</span><span class="price-gray" id="t-adj3">0 円</span></div>
+      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px">
+        <span style="font-weight:600">工事費小計</span>
+        <span class="price-grn" id="t-subtotal">0 円</span>
+      </div>
+      <div class="total-row" style="background:#fff9c4;padding:6px 10px;border-radius:6px;margin-top:4px;border:1px solid #ffe082">
+        <span style="font-weight:600;color:#795500">予備費（想定外補修費用）
+          <input type="number" id="bufRate" value="30" min="0" max="100" step="1" oninput="recalc()"
+            style="width:52px;font-size:13px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;text-align:center;font-weight:700;margin:0 3px">
+          ％
+        </span>
+        <span style="font-weight:700;color:#795500" id="t-buf">0 円</span>
+      </div>
       <div class="total-row main"><span>概算総額（税込）</span><span class="amt" id="t-total">0 円</span></div>
     </div>
 
@@ -158,6 +202,27 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
     <div class="card" id="estimateHTML"></div>
     <button class="btn-back no-print" onclick="goBack()">← 入力画面に戻る</button>
     <button class="btn-print no-print" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+  </div>
+</div>
+
+<!-- 保存ダイアログ -->
+<div class="modal-bg" id="saveDlg" style="display:none">
+  <div class="modal">
+    <h3>💾 名前をつけて保存</h3>
+    <input type="text" id="saveNameInput" placeholder="例：山田様邸 マンション73㎡">
+    <div class="modal-btns">
+      <button class="btn-ok" onclick="doSave()">保存する</button>
+      <button class="btn-cancel" onclick="closeDlg('saveDlg')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- 履歴ダイアログ -->
+<div class="modal-bg" id="historyDlg" style="display:none">
+  <div class="modal">
+    <h3>📂 保存済み一覧</h3>
+    <div class="history-list" id="historyList"></div>
+    <button class="btn-cancel" style="width:100%;padding:9px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;background:#888;color:#fff" onclick="closeDlg('historyDlg')">閉じる</button>
   </div>
 </div>
 
@@ -393,6 +458,11 @@ function recalc(){
   var adj3 = adjust - adj1 - adj2;
   var total = baseTotal; // 総額は常にbaseTotal（面積ベース）
 
+  // 予備費計算
+  var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
+  var buf = Math.round(baseTotal * bufRate / 100);
+  var grandTotal = baseTotal + buf;
+
   document.getElementById('t-base').textContent = fmt(baseTotal) + ' 円';
   document.getElementById('t-deduct').textContent = deductTotal > 0 ? '－' + fmt(deductTotal) + ' 円' : '0 円';
   document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
@@ -401,7 +471,9 @@ function recalc(){
   document.getElementById('t-adj1').textContent = fmt(adj1) + ' 円';
   document.getElementById('t-adj2').textContent = fmt(adj2) + ' 円';
   document.getElementById('t-adj3').textContent = fmt(adj3) + ' 円';
-  document.getElementById('t-total').textContent = fmt(total) + ' 円';
+  document.getElementById('t-subtotal').textContent = fmt(baseTotal) + ' 円';
+  document.getElementById('t-buf').textContent = fmt(buf) + ' 円';
+  document.getElementById('t-total').textContent = fmt(grandTotal) + ' 円';
 }
 
 function setTab(tab){
@@ -497,8 +569,14 @@ function goToEstimate(){
   rows += '<tr class="adj"><td>現場管理費・諸経費</td><td>一式</td><td>' + fmt(adj1) + ' 円</td></tr>';
   rows += '<tr class="adj"><td>設計・監理費</td><td>一式</td><td>' + fmt(adj2) + ' 円</td></tr>';
   rows += '<tr class="adj"><td>工事保険料・経費</td><td>一式</td><td>' + fmt(adj3) + ' 円</td></tr>';
+  if(buf > 0){
+    rows += '<tr class="sec"><td colspan="3">■ 予備費</td></tr>';
+    rows += '<tr style="background:#fff9c4"><td>想定外補修予備費（' + bufRate + '%）</td><td>一式</td><td>' + fmt(buf) + ' 円</td></tr>';
+  }
 
-  var total = baseTotal;
+  var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
+  var buf = Math.round(baseTotal * bufRate / 100);
+  var total = baseTotal + buf;
   var areaInfo = isKodate ? '室内面積：'+area+'㎡（延床：'+getFloorArea()+'㎡）' : '専有面積：'+area+'㎡';
   if(rawArea > 0 && rawArea < minArea) areaInfo += '　※入力' + rawArea + '㎡→最低保証' + minArea + '㎡として計算';
 
@@ -542,11 +620,216 @@ function goToEstimate(){
   window.scrollTo(0,0);
 }
 
+// ===== 保存・履歴機能 =====
+var SAVE_KEY = 'fullreno_saved';
+var savedCases = [];
+var currentId = null;
+var currentName = '';
+var deleteConfirmId = null;
+
+function loadSavedCases(){
+  try{ var s=localStorage.getItem(SAVE_KEY); if(s) savedCases=JSON.parse(s); }catch(e){}
+  document.getElementById('historyCount').textContent = savedCases.length;
+}
+
+function persistSave(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(savedCases)); }catch(e){}
+  document.getElementById('historyCount').textContent = savedCases.length;
+}
+
+function getState(){
+  var pack = currentTab==='mansion' ? mansionPack : kodatePack;
+  var locked = currentTab==='mansion' ? LOCKED_M : LOCKED_K;
+  var packState = {};
+  pack.forEach(function(item){
+    if(locked.indexOf(item.id)===-1){
+      var el = document.getElementById('pk_'+item.id);
+      if(el) packState[item.id] = el.checked;
+    }
+  });
+  var addState = {};
+  addData.forEach(function(g){ g.items.forEach(function(d){
+    var el = document.getElementById('ad_'+d.id);
+    if(el) addState[d.id] = {checked: el.checked, qty: getNum('qa_'+d.id,1)};
+  }); });
+  var otherState = [];
+  for(var i=1;i<=OTHER_COUNT;i++){
+    var el=document.getElementById('ot_'+i);
+    otherState.push({
+      checked: el?el.checked:false,
+      name: document.getElementById('oname_'+i)?document.getElementById('oname_'+i).value:'',
+      price: getNum('oprice_'+i,0)
+    });
+  }
+  return {
+    tab: currentTab,
+    customerName: document.getElementById('customerName').value,
+    address: document.getElementById('address').value,
+    area: document.getElementById('areaInput').value,
+    floorArea: document.getElementById('floorAreaInput').value,
+    bufRate: document.getElementById('bufRate').value,
+    packState: packState,
+    addState: addState,
+    otherState: otherState,
+  };
+}
+
+function restoreState(state){
+  if(!state) return;
+  setTab(state.tab||'mansion');
+  document.getElementById('customerName').value = state.customerName||'';
+  document.getElementById('address').value = state.address||'';
+  document.getElementById('areaInput').value = state.area||73;
+  document.getElementById('floorAreaInput').value = state.floorArea||105;
+  document.getElementById('bufRate').value = state.bufRate||30;
+  var pack = state.tab==='mansion' ? mansionPack : kodatePack;
+  if(state.packState){
+    pack.forEach(function(item){
+      var el = document.getElementById('pk_'+item.id);
+      if(el && state.packState[item.id]!==undefined) el.checked = state.packState[item.id];
+    });
+  }
+  if(state.addState){
+    addData.forEach(function(g){ g.items.forEach(function(d){
+      var el = document.getElementById('ad_'+d.id);
+      if(el && state.addState[d.id]){
+        el.checked = state.addState[d.id].checked;
+        var qel = document.getElementById('qa_'+d.id);
+        if(qel) qel.value = state.addState[d.id].qty||1;
+      }
+    }); });
+  }
+  if(state.otherState){
+    for(var i=0;i<state.otherState.length;i++){
+      var idx=i+1;
+      var el=document.getElementById('ot_'+idx);
+      if(el){ el.checked=state.otherState[i].checked; }
+      var nel=document.getElementById('oname_'+idx);
+      if(nel) nel.value=state.otherState[i].name||'';
+      var pel=document.getElementById('oprice_'+idx);
+      if(pel) pel.value=state.otherState[i].price||0;
+    }
+  }
+  recalc();
+}
+
+function updateSaveBar(){
+  var bar = document.getElementById('saveBar');
+  if(currentId && currentName){
+    bar.innerHTML = '<span class="current-name">✏️ '+currentName+'</span>' +
+      '<button class="save-bar button btn-overwrite" onclick="doOverwrite()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#2e7d32;color:#fff">💾 上書き保存</button>' +
+      '<button class="save-bar button btn-altname" onclick="openSaveDialog()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#4a7ab5;color:#fff">📋 別名保存</button>' +
+      '<button class="save-bar button btn-history" onclick="openHistory()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#555;color:#fff">📂 履歴 (<span id="historyCount">'+savedCases.length+'</span>)</button>' +
+      '<button class="save-bar button btn-new" onclick="newCase()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#888;color:#fff">＋ 新規</button>';
+  } else {
+    bar.innerHTML = '<button class="btn-save" onclick="openSaveDialog()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#1a3a6b;color:#fff">💾 保存</button>' +
+      '<button class="btn-history" onclick="openHistory()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#555;color:#fff">📂 履歴 (<span id="historyCount">'+savedCases.length+'</span>)</button>' +
+      '<button class="btn-new" onclick="newCase()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#888;color:#fff">＋ 新規</button>';
+  }
+}
+
+function openSaveDialog(){
+  var state = getState();
+  var defaultName = (state.customerName||'お客様')+'様邸 '+(state.tab==='mansion'?'マンション':'戸建て')+state.area+'㎡';
+  document.getElementById('saveNameInput').value = defaultName;
+  document.getElementById('saveDlg').style.display = 'flex';
+}
+
+function doSave(){
+  var name = document.getElementById('saveNameInput').value || '無題';
+  var newCase2 = { id: Date.now(), name: name, savedAt: new Date().toLocaleString('ja-JP'), data: getState() };
+  savedCases = [newCase2].concat(savedCases).slice(0,30);
+  currentId = newCase2.id; currentName = name;
+  persistSave();
+  closeDlg('saveDlg');
+  updateSaveBar();
+}
+
+function doOverwrite(){
+  savedCases = savedCases.map(function(item){
+    return item.id===currentId ? Object.assign({},item,{data:getState(),savedAt:new Date().toLocaleString('ja-JP')}) : item;
+  });
+  persistSave();
+  alert('上書き保存しました！');
+}
+
+function newCase(){
+  if(!confirm('現在の内容をクリアして新規作成しますか？')) return;
+  currentId=null; currentName='';
+  document.getElementById('customerName').value='';
+  document.getElementById('address').value='';
+  document.getElementById('areaInput').value=73;
+  document.getElementById('floorAreaInput').value=105;
+  document.getElementById('bufRate').value=30;
+  setTab('mansion');
+  var pack=mansionPack;
+  pack.forEach(function(item){ var el=document.getElementById('pk_'+item.id); if(el) el.checked=true; });
+  addData.forEach(function(g){ g.items.forEach(function(d){ var el=document.getElementById('ad_'+d.id); if(el) el.checked=false; }); });
+  for(var i=1;i<=OTHER_COUNT;i++){
+    var el=document.getElementById('ot_'+i); if(el) el.checked=false;
+    var nel=document.getElementById('oname_'+i); if(nel) nel.value='';
+    var pel=document.getElementById('oprice_'+i); if(pel) pel.value=0;
+  }
+  updateSaveBar();
+  recalc();
+}
+
+function openHistory(){
+  deleteConfirmId = null;
+  renderHistory();
+  document.getElementById('historyDlg').style.display = 'flex';
+}
+
+function renderHistory(){
+  var list = document.getElementById('historyList');
+  if(savedCases.length===0){
+    list.innerHTML = '<div style="text-align:center;color:#888;padding:20px;font-size:12px">保存されているデータはありません</div>';
+    return;
+  }
+  list.innerHTML = savedCases.map(function(item){
+    var isDel = deleteConfirmId===item.id;
+    return '<div class="history-item">' +
+      '<div class="history-item-name">'+item.name+'</div>' +
+      '<div class="history-item-date">保存日時：'+item.savedAt+'</div>' +
+      '<div class="history-item-btns">' +
+      '<button class="btn-load" onclick="loadCase('+item.id+')">📥 読み込む</button>' +
+      (isDel
+        ? '<button class="btn-del-confirm" onclick="deleteCase('+item.id+')">本当に削除</button><button class="btn-del" onclick="cancelDelete()">キャンセル</button>'
+        : '<button class="btn-del" onclick="confirmDelete('+item.id+')">🗑 削除</button>'
+      ) +
+      '</div></div>';
+  }).join('');
+}
+
+function loadCase(id){
+  var item = savedCases.filter(function(c){ return c.id===id; })[0];
+  if(!item) return;
+  currentId=item.id; currentName=item.name;
+  restoreState(item.data);
+  updateSaveBar();
+  closeDlg('historyDlg');
+}
+
+function confirmDelete(id){ deleteConfirmId=id; renderHistory(); }
+function cancelDelete(){ deleteConfirmId=null; renderHistory(); }
+
+function deleteCase(id){
+  savedCases = savedCases.filter(function(c){ return c.id!==id; });
+  if(currentId===id){ currentId=null; currentName=''; updateSaveBar(); }
+  persistSave();
+  deleteConfirmId=null;
+  renderHistory();
+}
+
+function closeDlg(id){ document.getElementById(id).style.display='none'; }
+
 // 初期化
+loadSavedCases();
 buildPackItems();
 buildKodatePackItems();
 buildAddItems();
 buildOtherItems();
+updateSaveBar();
 recalc();
 </script>
 </body>
