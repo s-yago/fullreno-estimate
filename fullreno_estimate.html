@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フルリノベーション見積もりシステム</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;font-size:13px;color:#333;background:#f0f4f8;padding:1rem}
+.app{max-width:980px;margin:0 auto}
+h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:center;padding:.75rem;background:#fff;border-radius:10px;border:1px solid #ddd}
+.tabs{display:flex;margin-bottom:1rem;border-radius:8px;overflow:hidden;border:1px solid #2e7d32}
+.tab{flex:1;padding:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:#fff;color:#2e7d32;transition:all .15s;text-align:center}
+.tab.active{background:#2e7d32;color:#fff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.card{border:1px solid #e0e0e0;border-radius:10px;padding:.875rem 1rem;background:#fff}
+.card-title{font-size:12px;font-weight:700;color:#555;margin-bottom:.625rem;padding-bottom:.5rem;border-bottom:1px solid #eee}
+.base-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:11px;color:#666;font-weight:600}
+.field input{font-size:14px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#333;width:100%}
+.area-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.area-input-wrap{display:flex;flex-direction:column;gap:3px}
+.area-input-wrap label{font-size:11px;color:#666;font-weight:600}
+.area-input-wrap input{font-size:18px;font-weight:700;padding:8px 12px;border:2px solid #2e7d32;border-radius:8px;width:120px;text-align:center;color:#2e7d32}
+.area-note{font-size:12px;color:#666;line-height:1.8;background:#f1f8e9;padding:8px 12px;border-radius:8px;border:1px solid #c8e6c9}
+.min-area-note{font-size:11px;color:#e65100;background:#fff3e0;padding:4px 8px;border-radius:6px;border:1px solid #ffcc02;margin-top:4px;font-weight:600}
+.item-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f5f5f5}
+.item-row:last-child{border-bottom:none}
+.item-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#2e7d32;flex-shrink:0}
+.item-label{font-size:12px;color:#333;flex:1;line-height:1.4}
+.item-price{font-size:12px;white-space:nowrap;text-align:right;min-width:100px;font-weight:600}
+.price-red{color:#A32D2D}
+.price-grn{color:#2e7d32}
+.price-gray{color:#888}
+.lock-icon{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.group-label{font-size:11px;color:#2e7d32;padding:6px 0 2px;font-weight:700;border-top:1px solid #f0f0f0;margin-top:4px}
+.totals{background:#fff;border:2px solid #2e7d32;border-radius:10px;padding:1rem;margin-bottom:1rem}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px;color:#555}
+.total-row.adjust{color:#888;font-size:12px;padding:2px 0 2px 12px}
+.total-row.main{padding-top:10px;margin-top:6px;border-top:2px solid #2e7d32;font-size:18px;font-weight:700;color:#333}
+.total-row.main .amt{color:#2e7d32}
+.btn-estimate{width:100%;padding:14px;background:#2e7d32;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:1rem}
+.btn-estimate:hover{background:#1b5e20}
+.btn-back{width:100%;padding:12px;background:#fff;color:#2e7d32;border:2px solid #2e7d32;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:1rem}
+.btn-print{width:100%;padding:12px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:.5rem}
+.page{display:none}.page.active{display:block}
+.kodate-only{display:none}
+.est-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:3px solid #2e7d32}
+.est-title{font-size:17px;font-weight:700;margin-bottom:.25rem}
+.est-total{font-size:32px;font-weight:700;color:#2e7d32;margin:8px 0}
+.est-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:1rem}
+.est-table th{background:#2e7d32;color:#fff;padding:7px 10px;text-align:left;font-weight:600}
+.est-table th:not(:first-child){text-align:right}
+.est-table td{padding:5px 10px;border-bottom:1px solid #eee}
+.est-table td:not(:first-child){text-align:right;white-space:nowrap}
+.est-table tr.sec td{background:#f1f8e9;font-weight:700;font-size:11px;color:#2e7d32;text-align:left!important}
+.est-table tr.deduct td{color:#A32D2D}
+.est-table tr.add td{color:#185FA5}
+.est-table tr.adj td{color:#888;font-size:11px}
+.est-table tr.subtotal td{background:#f0f4f8;font-weight:700}
+.est-table tr.grand td{background:#e8f5e9;font-weight:700;font-size:15px;color:#2e7d32}
+.notes{margin-top:1rem;font-size:11px;color:#666;line-height:1.8;background:#fffde7;border-radius:6px;padding:.75rem;border:1px solid #fff9c4}
+.notes p{padding-left:1em;text-indent:-1em}
+.notes p::before{content:"※ "}
+.warn-note{background:#fff3e0;border:1px solid #ffcc02;color:#e65100;font-weight:600}
+.warn-note p::before{content:"⚠ "}
+@media print{
+  .btn-back,.btn-estimate,.btn-print,.no-print{display:none!important}
+  body{background:white;padding:0}
+  .page.active{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🏠 フルリノベーション 概算見積もりシステム</h1>
+
+  <div class="page active" id="page-input">
+    <div class="tabs no-print">
+      <button class="tab active" id="tab-mansion" onclick="setTab('mansion')">🏢 マンション</button>
+      <button class="tab" id="tab-kodate" onclick="setTab('kodate')">🏠 戸建て</button>
+    </div>
+
+    <div class="base-info">
+      <div class="field"><label>お客様名</label><input type="text" id="customerName" placeholder="例：山田 太郎"></div>
+      <div class="field"><label>物件住所（任意）</label><input type="text" id="address" placeholder="例：富山市〇〇町1-2-3"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-title">面積入力</div>
+      <div class="area-box">
+        <div class="area-input-wrap">
+          <label id="areaLabel">専有面積（㎡）</label>
+          <input type="number" id="areaInput" value="73" min="1" max="300" step="1" oninput="recalc()">
+        </div>
+        <div>
+          <div class="area-note" id="areaNoteText">
+            基準面積：<strong>73㎡</strong>（930万円）<br>
+            1㎡増減につき <strong>±6万円</strong><br>
+            <span style="color:#e65100">61㎡以下は61㎡として計算</span>
+          </div>
+        </div>
+        <div class="area-input-wrap kodate-only">
+          <label>延床面積（㎡）</label>
+          <input type="number" id="floorAreaInput" value="105" min="1" max="500" step="1" oninput="recalc()">
+        </div>
+        <div class="kodate-only" style="font-size:12px;color:#666;line-height:1.8;background:#f1f8e9;padding:8px 12px;border-radius:8px;border:1px solid #c8e6c9">
+          外壁面積＝延床×1.3で概算<br>
+          外壁120㎡・屋根70㎡まで固定<br>
+          <span style="color:#e65100">85㎡以下は85㎡として計算</span>
+        </div>
+      </div>
+      <div class="min-area-note" id="minAreaNote" style="display:none"></div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div class="card-title">✅ パック工事内容（チェックON＝含む　外すと減額）</div>
+          <div id="packItems"></div>
+        </div>
+        <div class="card kodate-only" id="kodatePackCard">
+          <div class="card-title">🏠 戸建て専用工事（チェックON＝含む　外すと減額）</div>
+          <div id="kodatePackItems"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">➕ 追加工事（チェックで加算）</div>
+          <div id="addItems"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📝 その他工事（自由入力）</div>
+          <div id="otherItems"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="totals">
+      <div class="total-row"><span>パック基本金額（面積反映済）</span><span class="price-grn" id="t-base">0 円</span></div>
+      <div class="total-row"><span>パック除外工事（減額）</span><span class="price-red" id="t-deduct">0 円</span></div>
+      <div class="total-row kodate-only"><span>戸建て専用除外（減額）</span><span class="price-red" id="t-kodate-deduct">0 円</span></div>
+      <div class="total-row"><span>追加工事費</span><span class="price-grn" id="t-add">0 円</span></div>
+      <div class="total-row"><span>その他工事費</span><span class="price-grn" id="t-other">0 円</span></div>
+      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px"><span style="font-weight:600">調整費合計（内訳合計＝総額に自動調整）</span><span class="price-gray" id="t-adjust">0 円</span></div>
+      <div class="total-row adjust"><span>└ 現場管理費・諸経費</span><span class="price-gray" id="t-adj1">0 円</span></div>
+      <div class="total-row adjust"><span>└ 設計・監理費</span><span class="price-gray" id="t-adj2">0 円</span></div>
+      <div class="total-row adjust"><span>└ 工事保険料・経費</span><span class="price-gray" id="t-adj3">0 円</span></div>
+      <div class="total-row main"><span>概算総額（税込）</span><span class="amt" id="t-total">0 円</span></div>
+    </div>
+
+    <button class="btn-estimate" onclick="goToEstimate()">見積書を作成する →</button>
+  </div>
+
+  <div class="page" id="page-estimate">
+    <button class="btn-back no-print" onclick="goBack()">← 入力画面に戻る</button>
+    <div class="card" id="estimateHTML"></div>
+    <button class="btn-back no-print" onclick="goBack()">← 入力画面に戻る</button>
+    <button class="btn-print no-print" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+  </div>
+</div>
+
+<script>
+var currentTab = 'mansion';
+
+// ===== 基準値 =====
+var M_BASE_AREA = 73, M_MIN_AREA = 61, M_BASE_TOTAL = 9300000, M_UNIT = 60000;
+var K_BASE_AREA = 105, K_MIN_AREA = 85, K_BASE_TOTAL = 13600000, K_UNIT = 70000;
+
+// ===== マンション パック工事 =====
+// type: fix=固定, var_sqm=㎡変動, var_5sqm=5㎡変動
+// locked=true: 必須（チェック不可）
+var mansionPack = [
+  {id:'m01', label:'解体・撤去・産廃処理工事', type:'var_sqm', base:700000, baseArea:73, unit:0, locked:true},
+  {id:'m02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:589500, locked:false},
+  {id:'m03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:486000, locked:false},
+  {id:'m04', label:'洗面台新規設置工事', type:'fix', base:142200, locked:false},
+  {id:'m05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:88200, locked:false},
+  {id:'m06', label:'給湯器（20号）工事', type:'fix', base:150000, locked:false},
+  {id:'m07', label:'給排水・ガス配管工事', type:'fix', base:400000, locked:true},
+  {id:'m08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:394200, baseArea:73, unit:6000, locked:false},
+  {id:'m09', label:'クロス工事（壁・天井）', type:'var_sqm', base:755550, baseArea:73, unit:11500, locked:false},
+  {id:'m10', label:'電気工事（配線・分電盤・コンセント増設）', type:'var_sqm', base:360000, baseArea:73, unit:3000, locked:true},
+  {id:'m11', label:'照明器具取付工事', type:'var_5sqm', base:270000, baseArea:73, unit:12500, locked:false},
+  {id:'m12', label:'建具全箇所交換工事', type:'var_5sqm', base:400000, baseArea:73, unit:25000, locked:false},
+  {id:'m13', label:'換気扇交換（水回りのみ）', type:'fix', base:40000, locked:false},
+  {id:'m14', label:'畳表替え（固定）', type:'fix', base:40000, locked:false},
+  {id:'m15', label:'ふすま・障子張替工事', type:'fix', base:50000, locked:false},
+  {id:'m16', label:'網戸交換', type:'fix', base:15000, locked:false},
+  {id:'m17', label:'カギ交換（上下2か所）', type:'fix', base:20000, locked:false},
+  {id:'m18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:350000, locked:false},
+  {id:'m19', label:'内窓設置（4か所）', type:'fix', base:320000, locked:false},
+  {id:'m20', label:'ハウスクリーニング', type:'var_sqm', base:98550, baseArea:73, unit:1500, locked:true},
+];
+
+// ===== 戸建て パック工事 =====
+var kodatePack = [
+  {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1200000, locked:true},
+  {id:'k02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:522900, locked:false},
+  {id:'k03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:499500, locked:false},
+  {id:'k04', label:'洗面台新規設置工事', type:'fix', base:142200, locked:false},
+  {id:'k05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:88200, locked:false},
+  {id:'k06', label:'給湯器（20号）工事', type:'fix', base:150000, locked:false},
+  {id:'k07', label:'給排水・ガス配管工事', type:'fix', base:800000, locked:true},
+  {id:'k08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:822600, baseArea:105, unit:6000, locked:false},
+  {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1087650, baseArea:105, unit:11500, locked:false},
+  {id:'k10', label:'電気工事（配線・分電盤・コンセント増設）', type:'var_sqm', base:600000, baseArea:105, unit:3000, locked:true},
+  {id:'k11', label:'照明器具取付工事', type:'var_5sqm', base:300000, baseArea:105, unit:12500, locked:false},
+  {id:'k12', label:'建具全箇所交換工事', type:'var_5sqm', base:500000, baseArea:105, unit:25000, locked:false},
+  {id:'k13', label:'換気扇交換（水回りのみ）', type:'fix', base:40000, locked:false},
+  {id:'k14', label:'畳表替え（固定）', type:'fix', base:40000, locked:false},
+  {id:'k15', label:'ふすま・障子張替工事', type:'fix', base:50000, locked:false},
+  {id:'k16', label:'網戸交換', type:'fix', base:30000, locked:false},
+  {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:30000, locked:false},
+  {id:'k18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:350000, locked:false},
+  {id:'k19', label:'内窓設置（4か所）', type:'fix', base:320000, locked:false},
+  {id:'k20', label:'ハウスクリーニング', type:'fix', base:150000, locked:true},
+  {id:'k21', label:'外壁塗装工事（120㎡まで）', type:'fix', base:1200000, locked:false},
+  {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:600000, locked:false},
+  {id:'k23', label:'足場設置・撤去費', type:'fix', base:500000, locked:false},
+  {id:'k24', label:'ペアガラス内窓設置（8か所）', type:'fix', base:640000, locked:false},
+];
+
+// ===== 追加工事 =====
+var addData = [
+  {group:'マンション・戸建て共通', items:[
+    {id:'a01', label:'エアコン設置工事（追加）', price:550000, qty:false},
+    {id:'a02', label:'畳表替え工事（8帖まで）', price:60000, qty:false},
+    {id:'a03', label:'ふすま・障子張替工事（追加）', price:60000, qty:false},
+    {id:'a04', label:'カギ交換（上下2か所）（追加）', price:40000, qty:true, unit:'か所'},
+    {id:'a05', label:'コンセント移設・増設', price:40000, qty:true, unit:'箇所'},
+    {id:'a06', label:'床暖房設置工事', price:300000, qty:false},
+    {id:'a07', label:'浴室乾燥機設置', price:80000, qty:false},
+    {id:'a08', label:'食洗機設置工事', price:60000, qty:false},
+  ]},
+  {group:'戸建て追加', items:[
+    {id:'a09', label:'2階トイレ追加工事', price:250000, qty:false},
+    {id:'a10', label:'外壁塗装追加（120㎡超過分）', price:0, qty:false},
+    {id:'a11', label:'屋根塗装追加（70㎡超過分）', price:0, qty:false},
+  ]},
+];
+
+var OTHER_COUNT = 5;
+var LOCKED_M = ['m01','m07','m10','m20'];
+var LOCKED_K = ['k01','k07','k10','k20'];
+
+function fmt(n){ return Math.round(n).toLocaleString('ja-JP'); }
+
+function getArea(){
+  var raw = parseFloat(document.getElementById('areaInput').value) || (currentTab==='mansion'?73:105);
+  if(currentTab==='mansion') return Math.max(raw, M_MIN_AREA);
+  return Math.max(raw, K_MIN_AREA);
+}
+function getRawArea(){ return parseFloat(document.getElementById('areaInput').value)||0; }
+function getFloorArea(){
+  var raw = parseFloat(document.getElementById('floorAreaInput').value)||105;
+  return Math.max(raw, K_MIN_AREA);
+}
+
+function calcItemPrice(item, area){
+  var diff = area - item.baseArea;
+  if(item.type==='fix') return item.base;
+  if(item.type==='var_sqm') return Math.round(item.base + diff * item.unit);
+  if(item.type==='var_5sqm') return Math.round(item.base + (diff/5) * item.unit);
+  return item.base;
+}
+
+function getBaseTotal(area){
+  var base = currentTab==='mansion' ? M_BASE_TOTAL : K_BASE_TOTAL;
+  var baseArea = currentTab==='mansion' ? M_BASE_AREA : K_BASE_AREA;
+  var unit = currentTab==='mansion' ? M_UNIT : K_UNIT;
+  return base + (area - baseArea) * unit;
+}
+
+function buildPackItems(){
+  var area = getArea();
+  var pack = currentTab==='mansion' ? mansionPack : kodatePack;
+  var locked = currentTab==='mansion' ? LOCKED_M : LOCKED_K;
+  var html = '';
+  pack.forEach(function(item){
+    var price = calcItemPrice(item, area);
+    var isLocked = locked.indexOf(item.id) !== -1;
+    if(isLocked){
+      html += '<div class="item-row">' +
+        '<span class="lock-icon" title="必須工事">🔒</span>' +
+        '<span class="item-label" style="color:#888">' + item.label + '<small style="color:#aaa;margin-left:4px">（必須）</small></span>' +
+        '<span class="item-price price-gray" id="pkp_'+item.id+'">' + fmt(price) + ' 円</span>' +
+        '</div>';
+    } else {
+      html += '<div class="item-row">' +
+        '<input type="checkbox" id="pk_'+item.id+'" checked onchange="recalc()">' +
+        '<label class="item-label" for="pk_'+item.id+'">' + item.label + '</label>' +
+        '<span class="item-price price-red" id="pkp_'+item.id+'">' + fmt(price) + ' 円</span>' +
+        '</div>';
+    }
+  });
+  document.getElementById('packItems').innerHTML = html;
+}
+
+function buildKodatePackItems(){
+  // 戸建て専用は戸建てパックと共通なので不要（packItemsに統合）
+  document.getElementById('kodatePackItems').innerHTML = '';
+}
+
+function buildAddItems(){
+  var html = addData.map(function(g){
+    return '<div><div class="group-label">' + g.group + '</div>' +
+    g.items.map(function(d){
+      var qtyHtml = d.qty
+        ? '<div class="item-qty" style="display:flex;align-items:center;gap:3px;flex-shrink:0"><input type="number" id="qa_'+d.id+'" value="1" min="1" max="20" onchange="recalc()" style="width:44px;font-size:12px;padding:3px;border:1px solid #ddd;border-radius:4px;text-align:center"><span style="font-size:11px;color:#888">'+(d.unit||'式')+'</span></div>'
+        : '<span style="width:44px"></span>';
+      return '<div class="item-row">' +
+        '<input type="checkbox" id="ad_'+d.id+'" onchange="recalc()">' +
+        '<label class="item-label" for="ad_'+d.id+'">' + d.label + '</label>' +
+        '<span class="item-price price-grn">+' + fmt(d.price) + ' 円</span>' +
+        qtyHtml + '</div>';
+    }).join('') + '</div>';
+  }).join('');
+  document.getElementById('addItems').innerHTML = html;
+}
+
+function buildOtherItems(){
+  var html = '';
+  for(var i=1;i<=OTHER_COUNT;i++){
+    html += '<div class="item-row" style="gap:6px">' +
+      '<input type="checkbox" id="ot_'+i+'" onchange="recalc()">' +
+      '<input type="text" id="oname_'+i+'" placeholder="工事名" style="flex:1;font-size:12px;padding:4px 6px;border:1px solid #ddd;border-radius:4px">' +
+      '<input type="number" id="oprice_'+i+'" value="0" min="0" onchange="recalc()" style="width:90px;font-size:12px;padding:4px 6px;border:1px solid #ddd;border-radius:4px;text-align:right">' +
+      '<span style="font-size:11px;color:#888;flex-shrink:0">円</span>' +
+      '</div>';
+  }
+  document.getElementById('otherItems').innerHTML = html;
+}
+
+function getNum(id, def){ var el=document.getElementById(id); if(!el) return def||0; var v=parseFloat(el.value); return isNaN(v)?def||0:v; }
+
+function recalc(){
+  var area = getArea();
+  var rawArea = getRawArea();
+  var pack = currentTab==='mansion' ? mansionPack : kodatePack;
+  var locked = currentTab==='mansion' ? LOCKED_M : LOCKED_K;
+  var minArea = currentTab==='mansion' ? M_MIN_AREA : K_MIN_AREA;
+
+  // 最低面積注意表示
+  var noteEl = document.getElementById('minAreaNote');
+  if(rawArea > 0 && rawArea < minArea){
+    noteEl.style.display = 'block';
+    noteEl.textContent = '⚠ 入力面積' + rawArea + '㎡は最低面積' + minArea + '㎡未満のため、' + minArea + '㎡として計算しています。';
+  } else {
+    noteEl.style.display = 'none';
+  }
+
+  // パック金額（面積ベース）
+  var baseTotal = getBaseTotal(area);
+
+  // 除外工事の減額計算
+  var deductTotal = 0;
+  pack.forEach(function(item){
+    var price = calcItemPrice(item, area);
+    var isLocked = locked.indexOf(item.id) !== -1;
+    var priceEl = document.getElementById('pkp_'+item.id);
+    if(priceEl) priceEl.textContent = fmt(price) + ' 円';
+    if(!isLocked){
+      var el = document.getElementById('pk_'+item.id);
+      if(el && !el.checked) deductTotal += price;
+    }
+  });
+
+  // 追加工事
+  var addTotal = 0;
+  addData.forEach(function(g){ g.items.forEach(function(d){
+    var el = document.getElementById('ad_'+d.id);
+    if(el && el.checked){
+      var q = d.qty ? Math.max(1, getNum('qa_'+d.id,1)) : 1;
+      addTotal += d.price * q;
+    }
+  }); });
+
+  // その他工事
+  var otherTotal = 0;
+  for(var i=1;i<=OTHER_COUNT;i++){
+    var el = document.getElementById('ot_'+i);
+    if(el && el.checked) otherTotal += getNum('oprice_'+i,0);
+  }
+
+  // 調整費（内訳合計＝総額になるよう自動調整）
+  var workTotal = baseTotal - deductTotal + addTotal + otherTotal;
+  var adjust = baseTotal - workTotal; // 調整費 = 総額 - 工事費小計
+  // 調整費はマイナスになる場合もある（追加工事が多い場合）
+  var adj1 = Math.round(adjust * 0.5);
+  var adj2 = Math.round(adjust * 0.3);
+  var adj3 = adjust - adj1 - adj2;
+  var total = baseTotal; // 総額は常にbaseTotal（面積ベース）
+
+  document.getElementById('t-base').textContent = fmt(baseTotal) + ' 円';
+  document.getElementById('t-deduct').textContent = deductTotal > 0 ? '－' + fmt(deductTotal) + ' 円' : '0 円';
+  document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
+  document.getElementById('t-other').textContent = fmt(otherTotal) + ' 円';
+  document.getElementById('t-adjust').textContent = fmt(adjust) + ' 円';
+  document.getElementById('t-adj1').textContent = fmt(adj1) + ' 円';
+  document.getElementById('t-adj2').textContent = fmt(adj2) + ' 円';
+  document.getElementById('t-adj3').textContent = fmt(adj3) + ' 円';
+  document.getElementById('t-total').textContent = fmt(total) + ' 円';
+}
+
+function setTab(tab){
+  currentTab = tab;
+  document.getElementById('tab-mansion').classList.toggle('active', tab==='mansion');
+  document.getElementById('tab-kodate').classList.toggle('active', tab==='kodate');
+  var isKodate = tab==='kodate';
+  document.querySelectorAll('.kodate-only').forEach(function(el){ el.style.display = isKodate?'':'none'; });
+  if(isKodate){
+    document.getElementById('areaLabel').textContent = '室内面積（㎡）';
+    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>105㎡</strong>（1,360万円）<br>1㎡増減につき <strong>±7万円</strong><br><span style="color:#e65100">85㎡以下は85㎡として計算</span>';
+    document.getElementById('areaInput').value = 105;
+  } else {
+    document.getElementById('areaLabel').textContent = '専有面積（㎡）';
+    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>73㎡</strong>（930万円）<br>1㎡増減につき <strong>±6万円</strong><br><span style="color:#e65100">61㎡以下は61㎡として計算</span>';
+    document.getElementById('areaInput').value = 73;
+  }
+  buildPackItems();
+  recalc();
+}
+
+function goBack(){
+  document.getElementById('page-input').classList.add('active');
+  document.getElementById('page-estimate').classList.remove('active');
+  window.scrollTo(0,0);
+}
+
+function goToEstimate(){
+  var name = document.getElementById('customerName').value || 'お客様';
+  var addr = document.getElementById('address').value;
+  var today = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
+  var isKodate = currentTab==='kodate';
+  var type = isKodate?'戸建て':'マンション';
+  var area = getArea();
+  var rawArea = getRawArea();
+  var pack = isKodate ? kodatePack : mansionPack;
+  var locked = isKodate ? LOCKED_K : LOCKED_M;
+  var minArea = isKodate ? K_MIN_AREA : M_MIN_AREA;
+
+  var rows = '';
+  var baseTotal = getBaseTotal(area);
+  var deductTotal = 0, addTotal = 0, otherTotal = 0;
+
+  // パック工事
+  rows += '<tr class="sec"><td colspan="3">■ パック工事内容</td></tr>';
+  pack.forEach(function(item){
+    var price = calcItemPrice(item, area);
+    var isLocked = locked.indexOf(item.id) !== -1;
+    var el = document.getElementById('pk_'+item.id);
+    var checked = isLocked ? true : (el && el.checked);
+    if(checked){
+      rows += '<tr><td>' + item.label + '</td><td>1式</td><td>' + fmt(price) + ' 円</td></tr>';
+    } else {
+      deductTotal += price;
+      rows += '<tr class="deduct"><td>' + item.label + '　<small>（除外）</small></td><td>1式</td><td>－' + fmt(price) + ' 円</td></tr>';
+    }
+  });
+
+  // 追加工事
+  var hasAdd = false;
+  addData.forEach(function(g){ g.items.forEach(function(d){
+    var el = document.getElementById('ad_'+d.id);
+    if(el && el.checked){
+      if(!hasAdd){ rows += '<tr class="sec"><td colspan="3">■ 追加工事</td></tr>'; hasAdd=true; }
+      var q = d.qty ? Math.max(1,getNum('qa_'+d.id,1)) : 1;
+      var sub = d.price * q;
+      rows += '<tr class="add"><td>' + d.label + '</td><td>' + q + (d.unit||'式') + '</td><td>+' + fmt(sub) + ' 円</td></tr>';
+      addTotal += sub;
+    }
+  }); });
+
+  // その他工事
+  var hasOther = false;
+  for(var i=1;i<=OTHER_COUNT;i++){
+    var el = document.getElementById('ot_'+i);
+    if(el && el.checked){
+      var nm = document.getElementById('oname_'+i).value || 'その他工事'+i;
+      var pr = getNum('oprice_'+i,0);
+      if(!hasOther){ rows += '<tr class="sec"><td colspan="3">■ その他工事</td></tr>'; hasOther=true; }
+      rows += '<tr class="add"><td>' + nm + '</td><td>1式</td><td>+' + fmt(pr) + ' 円</td></tr>';
+      otherTotal += pr;
+    }
+  }
+
+  // 調整費
+  var workTotal = baseTotal - deductTotal + addTotal + otherTotal;
+  var adjust = baseTotal - workTotal;
+  var adj1 = Math.round(adjust * 0.5);
+  var adj2 = Math.round(adjust * 0.3);
+  var adj3 = adjust - adj1 - adj2;
+
+  rows += '<tr class="sec"><td colspan="3">■ 諸経費・管理費</td></tr>';
+  rows += '<tr class="adj"><td>現場管理費・諸経費</td><td>一式</td><td>' + fmt(adj1) + ' 円</td></tr>';
+  rows += '<tr class="adj"><td>設計・監理費</td><td>一式</td><td>' + fmt(adj2) + ' 円</td></tr>';
+  rows += '<tr class="adj"><td>工事保険料・経費</td><td>一式</td><td>' + fmt(adj3) + ' 円</td></tr>';
+
+  var total = baseTotal;
+  var areaInfo = isKodate ? '室内面積：'+area+'㎡（延床：'+getFloorArea()+'㎡）' : '専有面積：'+area+'㎡';
+  if(rawArea > 0 && rawArea < minArea) areaInfo += '　※入力' + rawArea + '㎡→最低保証' + minArea + '㎡として計算';
+
+  var notes = '<p>本見積もりは概算金額です。現地調査後に正式見積もりを提出いたします。</p>' +
+    '<p>建物の状況によって追加工事が必要になる場合があります。</p>' +
+    '<p>電気温水器・エコキュート（370ℓ）使用の場合、約20万円の追加費用が発生します。</p>';
+  if(!isKodate) notes += '<p>マンションでのフローリング張替は、管理規約によりLL-45等級以上の防音フローリングが義務付けられている場合があり、別途費用がかかる場合があります。</p>';
+  if(isKodate){
+    var wallArea = Math.round(getFloorArea() * 1.3);
+    var roofArea = getFloorArea();
+    notes += '<p>【屋根工事】スレート葺きに限り屋根面積70㎡までを本パックに含みます。70㎡超・スレート以外は別途要見積もりです。</p>';
+    notes += '<p>【外壁工事】外壁面積120㎡までを本パックに含みます。外壁面積概算：' + wallArea + '㎡' + (wallArea>120?'　★超過→別途要見積もり':'　（パック範囲内）') + '</p>';
+  }
+
+  var warnHtml = '';
+  if(rawArea > 0 && rawArea < minArea){
+    warnHtml = '<div class="notes warn-note" style="margin-bottom:1rem"><p>入力面積（' + rawArea + '㎡）は最低保証面積（' + minArea + '㎡）未満のため、' + minArea + '㎡として計算しています。</p></div>';
+  }
+
+  document.getElementById('estimateHTML').innerHTML =
+    '<div style="padding:1rem">' +
+    warnHtml +
+    '<div class="est-header">' +
+    '<div class="est-title">' + name + ' 様邸（' + type + '）フルリノベーション 概算お見積もり</div>' +
+    (addr?'<div style="font-size:12px;color:#888;margin-top:4px">'+addr+'</div>':'') +
+    '<div style="font-size:12px;color:#888;margin-top:4px">' + areaInfo + '　｜　見積日：' + today + '</div>' +
+    '<div class="est-total">' + fmt(total) + ' 円（税込）</div>' +
+    '<div style="font-size:12px;color:#666">※ 概算金額です。正式金額は現地調査後にご提示いたします。</div>' +
+    '</div>' +
+    '<table class="est-table">' +
+    '<thead><tr><th style="width:55%">工事項目</th><th style="width:12%">数量</th><th style="width:33%">金額</th></tr></thead>' +
+    '<tbody>' + rows +
+    '<tr class="subtotal"><td colspan="2" style="text-align:right">合計</td><td>' + fmt(total) + ' 円</td></tr>' +
+    '<tr class="grand"><td colspan="2" style="text-align:right">概算総額（税込）</td><td>' + fmt(total) + ' 円</td></tr>' +
+    '</tbody></table>' +
+    '<div class="notes">' + notes + '</div>' +
+    '</div>';
+
+  document.getElementById('page-input').classList.remove('active');
+  document.getElementById('page-estimate').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// 初期化
+buildPackItems();
+buildKodatePackItems();
+buildAddItems();
+buildOtherItems();
+recalc();
+</script>
+</body>
+</html>
