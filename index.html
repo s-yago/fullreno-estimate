@@ -257,6 +257,7 @@ var mansionPack = [
   {id:'m18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:350000, locked:false},
   {id:'m19', label:'内窓設置（4か所）', type:'fix', base:320000, locked:false},
   {id:'m20', label:'ハウスクリーニング', type:'var_sqm', base:98550, baseArea:73, unit:1500, locked:true},
+  {id:'m21', label:'養生費', type:'fix', base:70000, locked:true},
 ];
 
 // ===== 戸建て パック工事 =====
@@ -285,30 +286,32 @@ var kodatePack = [
   {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:600000, locked:false},
   {id:'k23', label:'足場設置・撤去費', type:'fix', base:500000, locked:false},
   {id:'k24', label:'ペアガラス内窓設置（8か所）', type:'fix', base:640000, locked:false},
+  {id:'k25', label:'養生費', type:'fix', base:70000, locked:true},
 ];
 
 // ===== 追加工事 =====
 var addData = [
   {group:'マンション・戸建て共通', items:[
     {id:'a01', label:'エアコン設置工事（追加）', price:550000, qty:false},
-    {id:'a02', label:'畳表替え工事（8帖まで）', price:60000, qty:false},
+    {id:'a02', label:'畳表替え工事（8帖まで・追加）', price:60000, qty:false},
     {id:'a03', label:'ふすま・障子張替工事（追加）', price:60000, qty:false},
     {id:'a04', label:'カギ交換（上下2か所）（追加）', price:40000, qty:true, unit:'か所'},
-    {id:'a05', label:'コンセント移設・増設', price:40000, qty:true, unit:'箇所'},
-    {id:'a06', label:'床暖房設置工事', price:300000, qty:false},
-    {id:'a07', label:'浴室乾燥機設置', price:80000, qty:false},
-    {id:'a08', label:'食洗機設置工事', price:60000, qty:false},
+    {id:'a05', label:'コンセント移設・増設', price:30000, qty:true, unit:'箇所'},
+    {id:'a06', label:'エアコン用コンセント新設', price:40000, qty:true, unit:'箇所'},
+    {id:'a07', label:'床暖房設置工事', price:300000, qty:false},
+    {id:'a08', label:'浴室暖房乾燥機（UB交換の場合）', price:70000, qty:false},
+    {id:'a09', label:'ビルトイン食洗機（キッチン交換の場合）', price:100000, qty:false},
   ]},
-  {group:'戸建て追加', items:[
-    {id:'a09', label:'2階トイレ追加工事', price:250000, qty:false},
-    {id:'a10', label:'外壁塗装追加（120㎡超過分）', price:0, qty:false},
-    {id:'a11', label:'屋根塗装追加（70㎡超過分）', price:0, qty:false},
+  {group:'戸建て専用追加', items:[
+    {id:'a10', label:'2階トイレ工事（1階トイレ交換の場合）', price:170000, qty:false},
+    {id:'a11', label:'外壁塗装追加（120㎡超過分）', price:0, qty:false},
+    {id:'a12', label:'屋根塗装追加（70㎡超過分）', price:0, qty:false},
   ]},
 ];
 
 var OTHER_COUNT = 5;
-var LOCKED_M = ['m01','m07','m10','m20'];
-var LOCKED_K = ['k01','k07','k10','k20'];
+var LOCKED_M = ['m01','m07','m10','m20','m21'];
+var LOCKED_K = ['k01','k07','k10','k20','k25'];
 
 function fmt(n){ return Math.round(n).toLocaleString('ja-JP'); }
 
