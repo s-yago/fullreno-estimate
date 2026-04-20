@@ -172,6 +172,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
     <div class="totals">
       <div class="total-row"><span>パック基本金額（面積反映済）</span><span class="price-grn" id="t-base">0 円</span></div>
       <div class="total-row"><span>パック除外工事（減額）</span><span class="price-red" id="t-deduct">0 円</span></div>
+      <div class="total-row" id="penalty-row" style="display:none"><span>⚠ パック構成調整額</span><span style="color:#e65100;font-weight:600" id="t-penalty">0 円</span></div>
       <div class="total-row kodate-only"><span>戸建て専用除外（減額）</span><span class="price-red" id="t-kodate-deduct">0 円</span></div>
       <div class="total-row"><span>追加工事費</span><span class="price-grn" id="t-add">0 円</span></div>
       <div class="total-row"><span>その他工事費</span><span class="price-grn" id="t-other">0 円</span></div>
@@ -241,8 +242,8 @@ var K_BASE_AREA = 105, K_MIN_AREA = 85, K_BASE_TOTAL = 13600000, K_UNIT = 70000;
 // locked=true: 必須（チェック不可）
 var mansionPack = [
   {id:'m01', label:'解体・撤去・産廃処理工事', type:'fix', base:900000, locked:true},
-  {id:'m02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:1008000, deduct:589500, locked:false},
-  {id:'m03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:831000, deduct:486000, locked:false},
+  {id:'m02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1147000, deduct:1139000, locked:false},
+  {id:'m03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'m04', label:'洗面台新規設置工事', type:'fix', base:243000, locked:false},
   {id:'m05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:151000, locked:false},
   {id:'m06', label:'給湯器（20号）工事', type:'fix', base:227200, locked:false},
@@ -266,10 +267,10 @@ var mansionPack = [
 // ===== 戸建て パック工事 =====
 var kodatePack = [
   {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1200000, deduct:1200000, locked:true},
-  {id:'k02', label:'ユニットバス新規設置工事（1坪タイプ）', type:'fix', base:894000, deduct:522900, locked:false},
-  {id:'k03', label:'システムキッチン新規設置工事（2.5m幅）', type:'fix', base:854000, deduct:499500, locked:false},
-  {id:'k04', label:'洗面台新規設置工事', type:'fix', base:243000, deduct:142200, locked:false},
-  {id:'k05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:151000, deduct:88200, locked:false},
+  {id:'k02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1027000, deduct:1019000, locked:false},
+  {id:'k03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
+  {id:'k04', label:'洗面台新規設置工事（タカラスタンダード・オンディーヌ）', type:'fix', base:166000, deduct:208000, locked:false},
+  {id:'k05', label:'トイレ新規設置工事（TOTO・ウォシュレット）', type:'fix', base:209000, deduct:209000, locked:false},
   {id:'k06', label:'給湯器（20号）工事', type:'fix', base:227200, deduct:150000, locked:false},
   {id:'k07', label:'給排水・ガス配管工事', type:'fix', base:700000, deduct:700000, locked:true},
   {id:'k08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:1250000, deduct:822600, baseArea:105, unit:9000, unitDeduct:6000, locked:false},
@@ -313,6 +314,19 @@ var addData = [
 ];
 
 var OTHER_COUNT = 5;
+// ペナルティ：水回り4点のうち外した数に応じて加算
+var PENALTY_ITEMS_M = ['m02','m03','m05','m06']; // UB・キッチン・洗面台・トイレ
+var PENALTY_ITEMS_K = ['k02','k03','k04','k05'];
+function calcPenalty(pack, penaltyIds){
+  var offCount = 0;
+  penaltyIds.forEach(function(id){
+    var el = document.getElementById('pk_'+id);
+    if(el && !el.checked) offCount++;
+  });
+  if(offCount === 1) return 100000;
+  if(offCount === 2) return 200000;
+  return 0;
+}
 var LOCKED_M = ['m01','m04','m08','m11','m21','m22'];
 var LOCKED_K = ['k01','k07','k10','k20','k25'];
 
@@ -459,13 +473,21 @@ function recalc(){
     if(el && el.checked) otherTotal += getNum('oprice_'+i,0);
   }
 
+  // ペナルティ計算
+  var penaltyIds2 = isKodate ? PENALTY_ITEMS_K : PENALTY_ITEMS_M;
+  var penalty = calcPenalty(isKodate ? kodatePack : mansionPack, penaltyIds2);
+
   // 工事費小計（チェック状況反映済み）
-  var workTotal = baseTotal - deductTotal + addTotal + otherTotal;
+  var workTotal = baseTotal - deductTotal + penalty + addTotal + otherTotal;
   // 調整費（内訳小計がbaseTotalになるよう自動調整）
   var adjust = baseTotal - workTotal;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
+
+  // ペナルティ計算（水回り1点外す+10万、2点外す+20万）
+  var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
+  var penalty = calcPenalty(pack, penaltyIds);
 
   // 予備費は工事費小計（baseTotal）に対して計算
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
@@ -475,6 +497,10 @@ function recalc(){
 
   document.getElementById('t-base').textContent = fmt(baseTotal) + ' 円';
   document.getElementById('t-deduct').textContent = deductTotal > 0 ? '－' + fmt(deductTotal) + ' 円' : '0 円';
+  var penaltyEl = document.getElementById('t-penalty');
+  if(penaltyEl){ penaltyEl.textContent = penalty > 0 ? '+' + fmt(penalty) + ' 円' : '0 円'; }
+  var penaltyRowEl = document.getElementById('penalty-row');
+  if(penaltyRowEl){ penaltyRowEl.style.display = penalty > 0 ? '' : 'none'; }
   document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
   document.getElementById('t-other').textContent = fmt(otherTotal) + ' 円';
   document.getElementById('t-adjust').textContent = fmt(adjust) + ' 円';
@@ -533,15 +559,16 @@ function goToEstimate(){
   // パック工事
   rows += '<tr class="sec"><td colspan="3">■ パック工事内容</td></tr>';
   pack.forEach(function(item){
-    var price = calcItemPrice(item, area);
+    var priceActual = calcItemPrice(item, area, false);
+    var priceDeduct = calcItemPrice(item, area, true);
     var isLocked = locked.indexOf(item.id) !== -1;
     var el = document.getElementById('pk_'+item.id);
     var checked = isLocked ? true : (el && el.checked);
     if(checked){
-      rows += '<tr><td>' + item.label + '</td><td>1式</td><td>' + fmt(price) + ' 円</td></tr>';
+      rows += '<tr><td>' + item.label + '</td><td>1式</td><td>' + fmt(priceActual) + ' 円</td></tr>';
     } else {
-      deductTotal += price;
-      rows += '<tr class="deduct"><td>' + item.label + '　<small>（除外）</small></td><td>1式</td><td>－' + fmt(price) + ' 円</td></tr>';
+      deductTotal += priceDeduct;
+      rows += '<tr class="deduct"><td>' + item.label + '　<small>（除外）</small></td><td>1式</td><td>－' + fmt(priceDeduct) + ' 円</td></tr>';
     }
   });
 
@@ -571,13 +598,24 @@ function goToEstimate(){
     }
   }
 
+  // パック構成調整額（水回り1点外す+10万、2点外す+20万）
+  var penaltyIds2 = isKodate ? PENALTY_ITEMS_K : PENALTY_ITEMS_M;
+  var penalty = calcPenalty(isKodate ? kodatePack : mansionPack, penaltyIds2);
+
   // 調整費
-  var workTotal = baseTotal - deductTotal + addTotal + otherTotal;
+  var workTotal = baseTotal - deductTotal + penalty + addTotal + otherTotal;
   var adjust = baseTotal - workTotal;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
 
+  var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
+  var buf = Math.round(baseTotal * bufRate / 100);
+  var total = baseTotal + buf; // 概算総額 = 工事費小計 + 予備費
+
+  if(penalty > 0){
+    rows += '<tr style="background:#fff3e0"><td>パック構成調整額</td><td>一式</td><td>+' + fmt(penalty) + ' 円</td></tr>';
+  }
   rows += '<tr class="sec"><td colspan="3">■ 諸経費・管理費</td></tr>';
   rows += '<tr class="adj"><td>現場管理費・諸経費</td><td>一式</td><td>' + fmt(adj1) + ' 円</td></tr>';
   rows += '<tr class="adj"><td>設計・監理費</td><td>一式</td><td>' + fmt(adj2) + ' 円</td></tr>';
@@ -586,10 +624,6 @@ function goToEstimate(){
     rows += '<tr class="sec"><td colspan="3">■ 予備費</td></tr>';
     rows += '<tr style="background:#fff9c4"><td>想定外補修予備費（' + bufRate + '%）</td><td>一式</td><td>' + fmt(buf) + ' 円</td></tr>';
   }
-
-  var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
-  var buf = Math.round(baseTotal * bufRate / 100);
-  var total = baseTotal + buf; // 概算総額 = 工事費小計 + 予備費
   var areaInfo = isKodate ? '室内面積：'+area+'㎡（延床：'+getFloorArea()+'㎡）' : '専有面積：'+area+'㎡';
   if(rawArea > 0 && rawArea < minArea) areaInfo += '　※入力' + rawArea + '㎡→最低保証' + minArea + '㎡として計算';
 
