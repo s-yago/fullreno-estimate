@@ -473,9 +473,9 @@ function recalc(){
     if(el && el.checked) otherTotal += getNum('oprice_'+i,0);
   }
 
-  // ペナルティ計算
-  var penaltyIds2 = isKodate ? PENALTY_ITEMS_K : PENALTY_ITEMS_M;
-  var penalty = calcPenalty(isKodate ? kodatePack : mansionPack, penaltyIds2);
+  // パック構成調整額（水回り1点外す+10万、2点外す+20万）
+  var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
+  var penalty = calcPenalty(pack, penaltyIds);
 
   // 工事費小計（チェック状況反映済み）
   var workTotal = baseTotal - deductTotal + penalty + addTotal + otherTotal;
@@ -484,10 +484,6 @@ function recalc(){
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
-
-  // ペナルティ計算（水回り1点外す+10万、2点外す+20万）
-  var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
-  var penalty = calcPenalty(pack, penaltyIds);
 
   // 予備費は工事費小計（baseTotal）に対して計算
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
