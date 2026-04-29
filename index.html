@@ -234,82 +234,89 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 var currentTab = 'mansion';
 
 // ===== 基準値 =====
-var M_BASE_AREA = 73, M_MIN_AREA = 61, M_BASE_TOTAL = 9300000, M_UNIT = 60000;
-var K_BASE_AREA = 105, K_MIN_AREA = 85, K_BASE_TOTAL = 13600000, K_UNIT = 70000;
+var M_BASE_AREA = 73, M_MIN_AREA = 61, M_MIN_TOTAL = 8580000, M_BASE_TOTAL = 9300000, M_UNIT = 60000;
+var K_BASE_AREA = 105, K_MIN_AREA = 85, K_MIN_TOTAL = 12200000, K_BASE_TOTAL = 13600000, K_UNIT = 70000;
 
 // ===== マンション パック工事 =====
 // type: fix=固定, var_sqm=㎡変動, var_5sqm=5㎡変動
 // locked=true: 必須（チェック不可）
 var mansionPack = [
-  {id:'m01', label:'解体・撤去・産廃処理工事', type:'fix', base:900000, locked:true},
+  {id:'m01', label:'解体・撤去・産廃処理工事', type:'fix', base:1009000, deduct:1009000, locked:true},
   {id:'m02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1147000, deduct:1139000, locked:false},
   {id:'m03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
-  {id:'m04', label:'洗面台新規設置工事', type:'fix', base:243000, locked:false},
-  {id:'m05', label:'トイレ新規設置工事（温水洗浄便座・タオルリング・ペーパーホルダー付）', type:'fix', base:151000, locked:false},
-  {id:'m06', label:'給湯器（20号）工事', type:'fix', base:227200, locked:false},
-  {id:'m07', label:'給排水・ガス配管工事', type:'fix', base:606000, locked:true},
-  {id:'m08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:914000, baseArea:73, unit:9100, locked:false},
-  {id:'m09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1207500, baseArea:73, unit:17400, locked:false},
-  {id:'m10', label:'電気工事（配線・分電盤・コンセント増設）', type:'var_sqm', base:545400, baseArea:73, unit:4500, locked:true},
-  {id:'m11', label:'照明器具取付工事', type:'var_5sqm', base:350000, baseArea:73, unit:18900, locked:false},
-  {id:'m12', label:'建具全箇所交換工事', type:'var_5sqm', base:500000, baseArea:73, unit:37900, locked:false},
-  {id:'m13', label:'換気扇交換（水回りのみ）', type:'fix', base:60600, locked:false},
-  {id:'m14', label:'畳表替え（固定）', type:'fix', base:60600, locked:false},
-  {id:'m15', label:'ふすま・障子張替工事', type:'fix', base:75800, locked:false},
-  {id:'m16', label:'網戸交換', type:'fix', base:22700, locked:false},
-  {id:'m17', label:'カギ交換（上下2か所）', type:'fix', base:30300, locked:false},
-  {id:'m18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:450000, locked:false},
-  {id:'m19', label:'内窓設置（4か所）', type:'fix', base:400000, locked:false},
-  {id:'m20', label:'ハウスクリーニング', type:'var_sqm', base:149300, baseArea:73, unit:2300, locked:true},
-  {id:'m21', label:'養生費', type:'fix', base:106000, locked:true},
+  {id:'m04', label:'UB・システムキッチン搬入費用', type:'fix', base:164000, deduct:164000, locked:true},
+  {id:'m05', label:'洗面台新規設置工事（タカラスタンダード・オンディーヌ）', type:'fix', base:166000, deduct:208000, locked:false},
+  {id:'m06', label:'トイレ新規設置工事（TOTO・ウォシュレット）', type:'fix', base:209000, deduct:209000, locked:false},
+  {id:'m07', label:'ガス給湯機（20号）工事', type:'fix', base:258000, deduct:150000, locked:false},
+  {id:'m08', label:'給排水・ガス配管工事', type:'var_sqm', base:750000, deduct:750000, baseArea:73, unit:16200, unitDeduct:16200, locked:true},
+  {id:'m09', label:'フロアタイル上貼り床工事', type:'var_sqm', base:825000, deduct:394200, baseArea:73, unit:11300, unitDeduct:6000, locked:false},
+  {id:'m10', label:'クロス工事（壁・天井）', type:'var_sqm', base:767000, deduct:755550, baseArea:73, unit:10500, unitDeduct:11500, locked:false},
+  {id:'m11', label:'電気工事（配線・コンセント）', type:'var_sqm', base:548000, deduct:548000, baseArea:73, unit:10000, unitDeduct:10000, locked:true},
+  {id:'m12', label:'照明器具取付工事', type:'var_5sqm', base:350000, deduct:270000, baseArea:73, unit:10000, unitDeduct:10000, locked:false},
+  {id:'m13', label:'建具全箇所交換工事', type:'var_10sqm', base:420000, deduct:400000, baseArea:73, unit:80000, unitDeduct:80000, locked:false},
+  {id:'m14', label:'換気扇交換（水回りのみ）', type:'fix', base:34000, deduct:34000, locked:false},
+  {id:'m15', label:'畳表替え（6帖）', type:'fix', base:68000, deduct:40000, locked:false},
+  {id:'m16', label:'ふすま（6面）・障子（2枚）張替工事', type:'fix', base:70000, deduct:50000, locked:false},
+  {id:'m17', label:'網戸交換', type:'var_5sqm', base:65000, deduct:15000, baseArea:73, unit:5000, unitDeduct:5000, locked:false},
+  {id:'m18', label:'カギ交換（上下2か所）', type:'fix', base:80000, deduct:20000, locked:false},
+  {id:'m19', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:520000, deduct:350000, locked:false},
+  {id:'m20', label:'ペアガラス内窓設置（4か所）', type:'fix', base:400000, deduct:320000, locked:false},
+  {id:'m21', label:'ハウスクリーニング', type:'var_sqm', base:118000, deduct:98550, baseArea:73, unit:1000, unitDeduct:1000, locked:true},
+  {id:'m22', label:'養生費', type:'fix', base:106000, deduct:106000, locked:true},
+  {id:'m23', label:'資材運搬費', type:'fix', base:70000, deduct:70000, locked:true},
 ];
 
 // ===== 戸建て パック工事 =====
 var kodatePack = [
-  {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1200000, deduct:1200000, locked:true},
+  {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1100000, deduct:1100000, locked:true},
   {id:'k02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1027000, deduct:1019000, locked:false},
   {id:'k03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'k04', label:'洗面台新規設置工事（タカラスタンダード・オンディーヌ）', type:'fix', base:166000, deduct:208000, locked:false},
   {id:'k05', label:'トイレ新規設置工事（TOTO・ウォシュレット）', type:'fix', base:209000, deduct:209000, locked:false},
-  {id:'k06', label:'給湯器（20号）工事', type:'fix', base:227200, deduct:150000, locked:false},
-  {id:'k07', label:'給排水・ガス配管工事', type:'fix', base:700000, deduct:700000, locked:true},
-  {id:'k08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:1250000, deduct:822600, baseArea:105, unit:9000, unitDeduct:6000, locked:false},
-  {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1100000, deduct:1087650, baseArea:105, unit:5400, unitDeduct:11500, locked:false},
-  {id:'k10', label:'電気工事（配線・分電盤・コンセント増設）', type:'fix', base:500000, deduct:500000, locked:true},
-  {id:'k11', label:'照明器具取付工事', type:'fix', base:454500, deduct:300000, locked:false},
-  {id:'k12', label:'建具全箇所交換工事', type:'fix', base:454500, deduct:500000, locked:false},
-  {id:'k13', label:'換気扇交換（水回りのみ）', type:'fix', base:60600, deduct:40000, locked:false},
-  {id:'k14', label:'畳表替え（固定）', type:'fix', base:60600, deduct:40000, locked:false},
-  {id:'k15', label:'ふすま・障子張替工事', type:'fix', base:75800, deduct:50000, locked:false},
-  {id:'k16', label:'網戸交換', type:'fix', base:45400, deduct:30000, locked:false},
-  {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:45400, deduct:30000, locked:false},
-  {id:'k18', label:'エアコン設置（リビング16畳1か所、6帖2か所）', type:'fix', base:480000, deduct:350000, locked:false},
-  {id:'k19', label:'内窓設置（4か所）', type:'fix', base:484800, deduct:320000, locked:false},
-  {id:'k20', label:'ハウスクリーニング', type:'fix', base:227200, deduct:150000, locked:true},
-  {id:'k21', label:'外壁塗装工事（120㎡まで）', type:'fix', base:770000, deduct:500000, locked:false},
-  {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:920000, deduct:600000, locked:false},
-  {id:'k23', label:'足場設置・撤去費', type:'fix', base:770000, deduct:500000, locked:false},
-  {id:'k24', label:'ペアガラス内窓設置（8か所）', type:'fix', base:856000, deduct:640000, locked:false},
-  {id:'k25', label:'養生費', type:'fix', base:106000, deduct:106000, locked:true},
+  {id:'k06', label:'ガス給湯機（24号）工事', type:'fix', base:270000, deduct:150000, locked:false},
+  {id:'k07', label:'給排水・ガス配管工事', type:'var_sqm', base:800000, deduct:800000, baseArea:105, unit:21200, unitDeduct:21200, locked:true},
+  {id:'k08', label:'フロアタイル上貼り床工事', type:'var_sqm', base:1187000, deduct:822600, baseArea:105, unit:11300, unitDeduct:6000, locked:false},
+  {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1160000, deduct:1087650, baseArea:105, unit:10500, unitDeduct:11500, locked:false},
+  {id:'k10', label:'電気工事（配線・コンセント）', type:'var_sqm', base:650000, deduct:650000, baseArea:105, unit:15000, unitDeduct:15000, locked:true},
+  {id:'k11', label:'照明器具取付工事', type:'var_5sqm', base:350000, deduct:300000, baseArea:105, unit:10000, unitDeduct:10000, locked:false},
+  {id:'k12', label:'建具全箇所交換工事', type:'var_10sqm', base:1100000, deduct:500000, baseArea:105, unit:80000, unitDeduct:80000, locked:false},
+  {id:'k13', label:'換気扇交換（固定）', type:'fix', base:125000, deduct:125000, locked:false},
+  {id:'k14', label:'畳表替え（6帖）', type:'fix', base:68000, deduct:40000, locked:false},
+  {id:'k15', label:'ふすま（6面）・障子（2枚）張替工事', type:'fix', base:70000, deduct:50000, locked:false},
+  {id:'k16', label:'網戸交換', type:'var_5sqm', base:65000, deduct:30000, baseArea:105, unit:5000, unitDeduct:5000, locked:false},
+  {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:80000, deduct:30000, locked:false},
+  {id:'k18', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:570000, deduct:350000, locked:false},
+  {id:'k19', label:'ペアガラス内窓設置（8か所）', type:'fix', base:780000, deduct:640000, locked:false},
+  {id:'k20', label:'ハウスクリーニング', type:'var_sqm', base:150000, deduct:150000, baseArea:105, unit:1000, unitDeduct:1000, locked:true},
+  {id:'k21', label:'外壁塗装工事（200㎡まで）', type:'fix', base:1336000, deduct:500000, locked:false},
+  {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:450000, deduct:450000, locked:false},
+  {id:'k23', label:'足場設置・撤去費（外壁・屋根工事時は必須）', type:'fix', base:440000, deduct:440000, locked:false},
+  {id:'k24', label:'養生費', type:'fix', base:50000, deduct:50000, locked:true},
+  {id:'k25', label:'資材運搬費', type:'fix', base:70000, deduct:70000, locked:true},
 ];
 
 // ===== 追加工事 =====
 var addData = [
   {group:'マンション・戸建て共通', items:[
-    {id:'a01', label:'エアコン設置工事・追加（6帖タイプ）', price:100000, qty:true, unit:'台'},
-    {id:'a02', label:'畳表替え工事（8帖まで・追加）', price:60000, qty:true, unit:'部屋'},
-    {id:'a03', label:'ふすま・障子張替工事（追加）', price:60000, qty:false},
-    {id:'a04', label:'カギ交換（上下2か所）（追加）', price:40000, qty:true, unit:'か所'},
-    {id:'a05', label:'コンセント移設・増設', price:30000, qty:true, unit:'箇所'},
-    {id:'a06', label:'エアコン用コンセント新設', price:40000, qty:true, unit:'箇所'},
-    {id:'a07', label:'床暖房設置工事', price:500000, qty:false},
-    {id:'a08', label:'浴室暖房乾燥機（UB交換の場合）', price:70000, qty:false},
-    {id:'a09', label:'ビルトイン食洗機（キッチン交換の場合）', price:100000, qty:false},
+    {id:'a01', label:'6帖エアコン設置工事（追加）', price:135000, qty:true, unit:'か所'},
+    {id:'a02', label:'畳表替え工事（追加）', price:12000, qty:true, unit:'帖'},
+    {id:'a03', label:'ふすま張替工事（追加）', price:9200, qty:true, unit:'面'},
+    {id:'a04', label:'カギ交換（追加）', price:30000, qty:true, unit:'か所'},
+    {id:'a05', label:'コンセント移設', price:35000, qty:true, unit:'か所'},
+    {id:'a06', label:'コンセント増設', price:50000, qty:true, unit:'か所'},
+    {id:'a07', label:'エアコン用コンセント新設', price:50000, qty:true, unit:'か所'},
+    {id:'a08', label:'リビング床暖房設置工事', price:500000, qty:false},
+    {id:'a09', label:'浴室乾燥暖房機（UB交換の場合）', price:200000, qty:false},
+    {id:'a10', label:'ビルトイン食洗機（キッチン交換の場合）', price:150000, qty:false},
+    {id:'a11', label:'キッチンIHコンロ設置', price:60000, qty:false},
+    {id:'a12', label:'キッチン吊戸棚', price:80000, qty:false},
+    {id:'a13', label:'キッチンキャビネット（W1800タイプ）', price:350000, qty:false},
   ]},
   {group:'戸建て専用追加', items:[
-    {id:'a10', label:'2階トイレ工事（1階トイレ交換の場合）', price:170000, qty:false},
-    {id:'a11', label:'外壁塗装追加（120㎡超過分）', price:5000, qty:true, unit:'㎡'},
-    {id:'a12', label:'屋根塗装追加（70㎡超過分）', price:10000, qty:true, unit:'㎡'},
+    {id:'a14', label:'2階トイレ工事（1階トイレ交換の場合）', price:170000, qty:false},
+    {id:'a15', label:'外壁塗装追加（200㎡超過分）', price:7700, qty:true, unit:'㎡'},
+    {id:'a16', label:'屋根塗装追加（70㎡超過分）', price:13000, qty:true, unit:'2㎡'},
+    {id:'a17', label:'カーポート設置（2台分）', price:0, qty:false, freeInput:true},
   ]},
 ];
 
@@ -324,11 +331,11 @@ function calcPenalty(pack, penaltyIds){
     if(el && !el.checked) offCount++;
   });
   if(offCount === 1) return 100000;
-  if(offCount === 2) return 200000;
+  if(offCount === 2) return 250000;
   return 0;
 }
-var LOCKED_M = ['m01','m04','m08','m11','m21','m22'];
-var LOCKED_K = ['k01','k07','k10','k20','k25'];
+var LOCKED_M = ['m01','m04','m08','m11','m21','m22','m23'];
+var LOCKED_K = ['k01','k07','k10','k20','k24','k25'];
 
 function fmt(n){ return Math.round(n).toLocaleString('ja-JP'); }
 
@@ -351,6 +358,7 @@ function calcItemPrice(item, area, useDeduct){
   if(item.type==='fix') return base;
   if(item.type==='var_sqm') return Math.round(base + diff * unit);
   if(item.type==='var_5sqm') return Math.round(base + (diff/5) * unit);
+  if(item.type==='var_10sqm') return Math.round(base + Math.floor(diff/10) * unit);
   return base;
 }
 
@@ -358,6 +366,9 @@ function getBaseTotal(area){
   var base = currentTab==='mansion' ? M_BASE_TOTAL : K_BASE_TOTAL;
   var baseArea = currentTab==='mansion' ? M_BASE_AREA : K_BASE_AREA;
   var unit = currentTab==='mansion' ? M_UNIT : K_UNIT;
+  var minTotal = currentTab==='mansion' ? M_MIN_TOTAL : K_MIN_TOTAL;
+  var minArea = currentTab==='mansion' ? M_MIN_AREA : K_MIN_AREA;
+  if(area <= minArea) return minTotal;
   return base + (area - baseArea) * unit;
 }
 
@@ -398,11 +409,13 @@ function buildAddItems(){
       var qtyHtml = d.qty
         ? '<div class="item-qty" style="display:flex;align-items:center;gap:3px;flex-shrink:0"><input type="number" id="qa_'+d.id+'" value="1" min="1" max="20" onchange="recalc()" style="width:44px;font-size:12px;padding:3px;border:1px solid #ddd;border-radius:4px;text-align:center"><span style="font-size:11px;color:#888">'+(d.unit||'式')+'</span></div>'
         : '<span style="width:44px"></span>';
+      var priceHtml = d.freeInput
+        ? '<input type="number" id="fi_'+d.id+'" value="0" min="0" onchange="recalc()" placeholder="金額入力" style="width:110px;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:4px;text-align:right"> 円'
+        : '<span class="item-price price-grn">+' + fmt(d.price) + ' 円</span>';
       return '<div class="item-row">' +
         '<input type="checkbox" id="ad_'+d.id+'" onchange="recalc()">' +
         '<label class="item-label" for="ad_'+d.id+'">' + d.label + '</label>' +
-        '<span class="item-price price-grn">+' + fmt(d.price) + ' 円</span>' +
-        qtyHtml + '</div>';
+        priceHtml + qtyHtml + '</div>';
     }).join('') + '</div>';
   }).join('');
   document.getElementById('addItems').innerHTML = html;
@@ -462,7 +475,8 @@ function recalc(){
     var el = document.getElementById('ad_'+d.id);
     if(el && el.checked){
       var q = d.qty ? Math.max(1, getNum('qa_'+d.id,1)) : 1;
-      addTotal += d.price * q;
+      var p = d.freeInput ? getNum('fi_'+d.id, 0) : d.price;
+      addTotal += p * q;
     }
   }); });
 
@@ -575,7 +589,8 @@ function goToEstimate(){
     if(el && el.checked){
       if(!hasAdd){ rows += '<tr class="sec"><td colspan="3">■ 追加工事</td></tr>'; hasAdd=true; }
       var q = d.qty ? Math.max(1,getNum('qa_'+d.id,1)) : 1;
-      var sub = d.price * q;
+      var p = d.freeInput ? getNum('fi_'+d.id, 0) : d.price;
+      var sub = p * q;
       rows += '<tr class="add"><td>' + d.label + '</td><td>' + q + (d.unit||'式') + '</td><td>+' + fmt(sub) + ' 円</td></tr>';
       addTotal += sub;
     }
