@@ -192,9 +192,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         </span>
         <span style="font-weight:700;color:#795500" id="t-buf">0 円</span>
       </div>
-      <div id="adjustWarn" style="display:none;background:#fff3e0;border:1px solid #ffcc02;border-radius:6px;padding:6px 10px;font-size:11px;color:#e65100;font-weight:600;margin-top:4px">
-        ⚠ 追加工事が多く調整費がマイナスになっています。パック基準金額内に収まらない工事が含まれている可能性があります。
-      </div>
+
       <div class="total-row main"><span>概算総額（税込）</span><span class="amt" id="t-total">0 円</span></div>
     </div>
 
@@ -521,8 +519,7 @@ function recalc(){
   document.getElementById('t-buf').textContent = fmt(buf) + ' 円';
   document.getElementById('t-total').textContent = fmt(grandTotal) + ' 円';
   // 調整費がマイナスの場合は警告
-  var warnEl = document.getElementById('adjustWarn');
-  if(warnEl){ warnEl.style.display = adjust < 0 ? 'block' : 'none'; }
+
 }
 
 function setTab(tab){
