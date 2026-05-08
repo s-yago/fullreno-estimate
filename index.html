@@ -173,16 +173,19 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
       <div class="total-row"><span>パック基本金額（面積反映済）</span><span class="price-grn" id="t-base">0 円</span></div>
       <div class="total-row"><span>パック除外工事（減額）</span><span class="price-red" id="t-deduct">0 円</span></div>
       <div class="total-row" id="penalty-row" style="display:none"><span>⚠ パック構成調整額</span><span style="color:#e65100;font-weight:600" id="t-penalty">0 円</span></div>
-      <div class="total-row kodate-only"><span>戸建て専用除外（減額）</span><span class="price-red" id="t-kodate-deduct">0 円</span></div>
-      <div class="total-row"><span>追加工事費</span><span class="price-grn" id="t-add">0 円</span></div>
-      <div class="total-row"><span>その他工事費</span><span class="price-grn" id="t-other">0 円</span></div>
-      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px"><span style="font-weight:600">調整費合計（内訳合計＝工事費に自動調整）</span><span class="price-gray" id="t-adjust">0 円</span></div>
+      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px"><span style="font-weight:600">調整費合計（パック工事費に自動調整）</span><span class="price-gray" id="t-adjust">0 円</span></div>
       <div class="total-row adjust"><span>└ 現場管理費・諸経費</span><span class="price-gray" id="t-adj1">0 円</span></div>
       <div class="total-row adjust"><span>└ 設計・監理費</span><span class="price-gray" id="t-adj2">0 円</span></div>
       <div class="total-row adjust"><span>└ 工事保険料・経費</span><span class="price-gray" id="t-adj3">0 円</span></div>
       <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px">
-        <span style="font-weight:600">工事費小計</span>
+        <span style="font-weight:600">パック工事費合計</span>
         <span class="price-grn" id="t-subtotal">0 円</span>
+      </div>
+      <div class="total-row"><span>追加工事費</span><span class="price-grn" id="t-add">0 円</span></div>
+      <div class="total-row"><span>その他工事費</span><span class="price-grn" id="t-other">0 円</span></div>
+      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:4px;padding-top:6px">
+        <span style="font-weight:600">工事費合計</span>
+        <span class="price-grn" id="t-worktotal">0 円</span>
       </div>
       <div class="total-row" style="background:#fff9c4;padding:6px 10px;border-radius:6px;margin-top:4px;border:1px solid #ffe082">
         <span style="font-weight:600;color:#795500">予備費（想定外補修費用）
@@ -192,7 +195,6 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         </span>
         <span style="font-weight:700;color:#795500" id="t-buf">0 円</span>
       </div>
-
       <div class="total-row main"><span>概算総額（税込）</span><span class="amt" id="t-total">0 円</span></div>
     </div>
 
@@ -489,19 +491,39 @@ function recalc(){
   var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
   var penalty = calcPenalty(pack, penaltyIds);
 
-  // 工事費小計（チェック状況反映済み）
-  var workTotal = baseTotal - deductTotal + penalty + addTotal + otherTotal;
-  // 調整費（内訳小計がbaseTotalになるよう自動調整）
-  var adjust = baseTotal - workTotal;
+  // A案：調整費はパック工事費のみで計算（追加・その他工事は別途上乗せ）
+  // パック工事費小計 = 総額 - 除外減額 + パック構成調整額
+  var packSubtotal = baseTotal - deductTotal + penalty;
+  // 調整費 = パック基本金額 - パック工事費小計（除外・追加なしの基準値との差）
+  var adjust = baseTotal - (baseTotal - deductTotal + penalty);
+  // ※adjustは deductTotal - penalty になる（除外した分が調整費に転換）
+  // 正しくは：パック実際工事費合計をpackSubtotalとし、調整費=baseTotal-packActual
+  // packActual = baseTotal - deductTotal（除外した工事の実際工事費は引かない）
+  // 調整費 = baseTotal - packActual = deductTotal - penalty
+  adjust = deductTotal > 0 ? baseTotal - (baseTotal - deductTotal) - penalty : baseTotal - baseTotal - penalty;
+  // シンプルに：全チェックONの場合の調整費を計算
+  // パック工事実際工事費合計
+  var packActualSum = 0;
+  pack.forEach(function(item){
+    var isLocked = locked.indexOf(item.id) !== -1;
+    var el = document.getElementById('pk_'+item.id);
+    var checked = isLocked ? true : (el && el.checked);
+    if(checked) packActualSum += calcItemPrice(item, area, false);
+  });
+  // 調整費 = パック総額 - パック実際工事費合計 - パック構成調整額
+  adjust = baseTotal - packActualSum - penalty;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
 
-  // 予備費は工事費小計（baseTotal）に対して計算
+  // パック工事費合計（調整費込み）= baseTotal
+  // 工事費合計 = パック総額 + 追加工事 + その他工事
+  var workTotal = baseTotal + addTotal + otherTotal;
+  // 予備費は工事費合計に対して計算
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
-  var buf = Math.round(baseTotal * bufRate / 100);
-  // 概算総額 = 工事費小計 + 予備費
-  var grandTotal = baseTotal + buf;
+  var buf = Math.round(workTotal * bufRate / 100);
+  // 概算総額 = 工事費合計 + 予備費
+  var grandTotal = workTotal + buf;
 
   document.getElementById('t-base').textContent = fmt(baseTotal) + ' 円';
   document.getElementById('t-deduct').textContent = deductTotal > 0 ? '－' + fmt(deductTotal) + ' 円' : '0 円';
@@ -509,17 +531,17 @@ function recalc(){
   if(penaltyEl){ penaltyEl.textContent = penalty > 0 ? '+' + fmt(penalty) + ' 円' : '0 円'; }
   var penaltyRowEl = document.getElementById('penalty-row');
   if(penaltyRowEl){ penaltyRowEl.style.display = penalty > 0 ? '' : 'none'; }
-  document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
-  document.getElementById('t-other').textContent = fmt(otherTotal) + ' 円';
   document.getElementById('t-adjust').textContent = fmt(adjust) + ' 円';
   document.getElementById('t-adj1').textContent = fmt(adj1) + ' 円';
   document.getElementById('t-adj2').textContent = fmt(adj2) + ' 円';
   document.getElementById('t-adj3').textContent = fmt(adj3) + ' 円';
   document.getElementById('t-subtotal').textContent = fmt(baseTotal) + ' 円';
+  document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
+  document.getElementById('t-other').textContent = fmt(otherTotal) + ' 円';
+  var worktotalEl = document.getElementById('t-worktotal');
+  if(worktotalEl) worktotalEl.textContent = fmt(workTotal) + ' 円';
   document.getElementById('t-buf').textContent = fmt(buf) + ' 円';
   document.getElementById('t-total').textContent = fmt(grandTotal) + ' 円';
-  // 調整費がマイナスの場合は警告
-
 }
 
 function setTab(tab){
@@ -627,8 +649,9 @@ function goToEstimate(){
   var adj3 = adjust - adj1 - adj2;
 
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
-  var buf = Math.round(baseTotal * bufRate / 100);
-  var total = baseTotal + buf; // 概算総額 = 工事費小計 + 予備費
+  var workTotalEst = baseTotal + addTotal + otherTotal; // 工事費合計 = パック総額 + 追加 + その他
+  var buf = Math.round(workTotalEst * bufRate / 100);
+  var total = workTotalEst + buf; // 概算総額 = 工事費合計 + 予備費
 
   if(penalty > 0){
     rows += '<tr style="background:#fff3e0"><td>パック構成調整額</td><td>一式</td><td>+' + fmt(penalty) + ' 円</td></tr>';
@@ -673,7 +696,10 @@ function goToEstimate(){
     '<table class="est-table">' +
     '<thead><tr><th style="width:55%">工事項目</th><th style="width:12%">数量</th><th style="width:33%">金額</th></tr></thead>' +
     '<tbody>' + rows +
-    '<tr class="subtotal"><td colspan="2" style="text-align:right">合計</td><td>' + fmt(total) + ' 円</td></tr>' +
+    '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費合計</td><td>' + fmt(baseTotal) + ' 円</td></tr>' +
+    (addTotal+otherTotal > 0 ? '<tr class="subtotal"><td colspan="2" style="text-align:right">追加・その他工事費合計</td><td>+' + fmt(addTotal+otherTotal) + ' 円</td></tr>' +
+    '<tr class="subtotal"><td colspan="2" style="text-align:right">工事費合計</td><td>' + fmt(workTotalEst) + ' 円</td></tr>' : '') +
+    (buf > 0 ? '<tr style="background:#fff9c4"><td>想定外補修予備費（' + bufRate + '%）</td><td>一式</td><td>' + fmt(buf) + ' 円</td></tr>' : '') +
     '<tr class="grand"><td colspan="2" style="text-align:right">概算総額（税込）</td><td>' + fmt(total) + ' 円</td></tr>' +
     '</tbody></table>' +
     '<div class="notes">' + notes + '</div>' +
