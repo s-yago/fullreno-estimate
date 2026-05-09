@@ -505,7 +505,7 @@ function recalc(){
   var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
   var penalty = calcPenalty(pack, penaltyIds);
 
-  // パック工事費 = パック基本総額 - 除外工事の減額金額合計 + パック割引解消額
+  // パック工事費 = パック基本総額 - 除外工事の減額金額合計
   var packActualSum = 0;
   pack.forEach(function(item){
     var isLocked = locked.indexOf(item.id) !== -1;
@@ -513,10 +513,10 @@ function recalc(){
     var checked = isLocked ? true : (el && el.checked);
     if(checked) packActualSum += calcItemPrice(item, area, false);
   });
-  // パック工事費合計（表示用）= 基本総額 - 除外減額 + 割引解消
-  var packTotal = baseTotal - deductTotal + penalty;
-  // 調整費 = パック工事費合計 - パック実際工事費合計
-  var adjust = packTotal - packActualSum;
+  // パック工事費合計 = 基本総額 - 除外減額（割引解消額は調整費に含める）
+  var packTotal = baseTotal - deductTotal;
+  // 調整費 = パック工事費合計 - パック実際工事費合計 + パック割引解消額
+  var adjust = packTotal - packActualSum + penalty;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
@@ -646,15 +646,16 @@ function goToEstimate(){
     var checked = isLocked ? true : (el && el.checked);
     if(checked) packActualTotal += calcItemPrice(item, area, false);
   });
-  var packTotalEst = baseTotal - deductTotal + penalty;
-  // 調整費 = パック工事費合計 - パック実際工事費合計
-  var adjust = packTotalEst - packActualTotal;
+  // パック工事費 = 基本総額 - 除外減額（割引解消額は調整費に含める）
+  var packTotalEst = baseTotal - deductTotal;
+  // 調整費 = パック工事費 - 実際工事費合計 + 割引解消額
+  var adjust = packTotalEst - packActualTotal + penalty;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
 
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
-  var workTotalEst = packTotalEst + addTotal + otherTotal; // 工事費合計 = パック工事費 + 追加 + その他
+  var workTotalEst = packTotalEst + addTotal + otherTotal; // 工事費合計 = パック工事費（除外減額後）+ 追加 + その他
   var buf = Math.round(workTotalEst * bufRate / 100);
   var total = workTotalEst + buf; // 概算総額 = 工事費合計 + 予備費
 
