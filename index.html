@@ -532,16 +532,18 @@ function recalc(){
     var checked = isLocked ? true : (el && el.checked);
     if(checked) packActualSum += calcItemPrice(item, area, false);
   });
-  // パック工事費合計 = 基本総額 - 除外減額（割引解消額は調整費に含める）
+  // パック工事費 = 基本総額 - 除外減額
   var packTotal = baseTotal - deductTotal;
-  // 調整費 = パック工事費合計 - パック実際工事費合計 + パック割引解消額
-  var adjust = packTotal - packActualSum + penalty;
+  // 調整費 = パック工事費 - 実際工事費合計（パック割引解消は別途加算）
+  var adjust = packTotal - packActualSum;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
+  // パック工事費合計 = パック工事費 + パック割引解消額
+  var packTotalWithPenalty = packTotal + penalty;
 
-  // 工事費合計 = パック工事費 + 追加工事 + その他工事
-  var workTotal = packTotal + addTotal + otherTotal;
+  // 工事費合計 = パック工事費合計 + 追加工事 + その他工事
+  var workTotal = packTotalWithPenalty + addTotal + otherTotal;
   // 予備費は工事費合計に対して計算
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
   var buf = Math.round(workTotal * bufRate / 100);
@@ -560,7 +562,7 @@ function recalc(){
   document.getElementById('t-adj1').textContent = fmt(adj1) + ' 円';
   document.getElementById('t-adj2').textContent = fmt(adj2) + ' 円';
   document.getElementById('t-adj3').textContent = fmt(adj3) + ' 円';
-  document.getElementById('t-subtotal').textContent = fmt(packTotal) + ' 円';
+  document.getElementById('t-subtotal').textContent = fmt(packTotalWithPenalty) + ' 円';
   document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
   document.getElementById('t-other').textContent = fmt(otherTotal) + ' 円';
   var worktotalEl = document.getElementById('t-worktotal');
@@ -665,22 +667,21 @@ function goToEstimate(){
     var checked = isLocked ? true : (el && el.checked);
     if(checked) packActualTotal += calcItemPrice(item, area, false);
   });
-  // パック工事費 = 基本総額 - 除外減額（割引解消額は調整費に含める）
+  // パック工事費 = 基本総額 - 除外減額
   var packTotalEst = baseTotal - deductTotal;
-  // 調整費 = パック工事費 - 実際工事費合計 + 割引解消額
-  var adjust = packTotalEst - packActualTotal + penalty;
+  // 調整費 = パック工事費 - 実際工事費合計（パック割引解消は別途加算）
+  var adjust = packTotalEst - packActualTotal;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
+  // パック工事費合計 = パック工事費 + パック割引解消
+  var packTotalWithPenaltyEst = packTotalEst + penalty;
 
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
-  var workTotalEst = packTotalEst + addTotal + otherTotal; // 工事費合計 = パック工事費（除外減額後）+ 追加 + その他
+  var workTotalEst = packTotalWithPenaltyEst + addTotal + otherTotal; // 工事費合計
   var buf = Math.round(workTotalEst * bufRate / 100);
   var total = workTotalEst + buf; // 概算総額 = 工事費合計 + 予備費
 
-  if(penalty > 0){
-    rows += '<tr style="background:#fff3e0"><td>パック構成調整額</td><td>一式</td><td>+' + fmt(penalty) + ' 円</td></tr>';
-  }
   rows += '<tr class="sec"><td colspan="3">■ 諸経費・管理費　合計 ' + fmt(adjust) + ' 円（内訳）</td></tr>';
   rows += '<tr class="adj"><td>　└ 現場管理費・諸経費（50%）</td><td>一式</td><td>' + fmt(adj1) + ' 円</td></tr>';
   rows += '<tr class="adj"><td>　└ 設計・監理費（30%）</td><td>一式</td><td>' + fmt(adj2) + ' 円</td></tr>';
@@ -717,7 +718,13 @@ function goToEstimate(){
     '<table class="est-table">' +
     '<thead><tr><th style="width:55%">工事項目</th><th style="width:12%">数量</th><th style="width:33%">金額</th></tr></thead>' +
     '<tbody>' + rows +
-    '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費合計</td><td>' + fmt(packTotalEst) + ' 円</td></tr>' +
+    (penalty > 0 ?
+      '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費小計</td><td>' + fmt(packTotalEst) + ' 円</td></tr>' +
+      '<tr style="background:#fff3e0"><td>パック割引解消</td><td>一式</td><td>+' + fmt(penalty) + ' 円</td></tr>' +
+      '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費合計</td><td>' + fmt(packTotalWithPenaltyEst) + ' 円</td></tr>'
+    :
+      '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費合計</td><td>' + fmt(packTotalEst) + ' 円</td></tr>'
+    ) +
     (addTotal+otherTotal > 0 ?
       '<tr class="subtotal"><td colspan="2" style="text-align:right">追加・その他工事費合計</td><td>+' + fmt(addTotal+otherTotal) + ' 円</td></tr>' +
       '<tr class="subtotal"><td colspan="2" style="text-align:right">工事費合計</td><td>' + fmt(workTotalEst) + ' 円</td></tr>'
