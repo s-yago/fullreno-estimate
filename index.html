@@ -173,10 +173,13 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
       <div class="total-row"><span>パック基本金額（面積反映済）</span><span class="price-grn" id="t-base">0 円</span></div>
       <div class="total-row"><span>パック除外工事（減額）</span><span class="price-red" id="t-deduct">0 円</span></div>
       <div class="total-row" id="penalty-row" style="display:none"><span>⚠ パック構成調整額</span><span style="color:#e65100;font-weight:600" id="t-penalty">0 円</span></div>
-      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px"><span style="font-weight:600">調整費合計（パック工事費に自動調整）</span><span class="price-gray" id="t-adjust">0 円</span></div>
-      <div class="total-row adjust"><span>└ 現場管理費・諸経費</span><span class="price-gray" id="t-adj1">0 円</span></div>
-      <div class="total-row adjust"><span>└ 設計・監理費</span><span class="price-gray" id="t-adj2">0 円</span></div>
-      <div class="total-row adjust"><span>└ 工事保険料・経費</span><span class="price-gray" id="t-adj3">0 円</span></div>
+      <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px">
+        <span style="font-weight:600">諸経費・管理費合計<small style="font-weight:400;color:#888;margin-left:6px">（内訳：現場管理費50%・設計監理費30%・保険料20%）</small></span>
+        <span class="price-gray" id="t-adjust">0 円</span>
+      </div>
+      <div class="total-row adjust"><span>└ 現場管理費・諸経費（50%）</span><span class="price-gray" id="t-adj1">0 円</span></div>
+      <div class="total-row adjust"><span>└ 設計・監理費（30%）</span><span class="price-gray" id="t-adj2">0 円</span></div>
+      <div class="total-row adjust"><span>└ 工事保険料・経費（20%）</span><span class="price-gray" id="t-adj3">0 円</span></div>
       <div class="total-row" style="border-top:1px dashed #ccc;margin-top:6px;padding-top:8px">
         <span style="font-weight:600">パック工事費合計</span>
         <span class="price-grn" id="t-subtotal">0 円</span>
@@ -333,8 +336,8 @@ function calcPenalty(pack, penaltyIds){
     if(el && !el.checked) offCount++;
   });
   if(offCount === 1) return 150000;
-  if(offCount === 2) return 500000;
-  if(offCount >= 3) return 1050000;
+  if(offCount === 2) return 350000;
+  if(offCount >= 3) return 550000;
   return 0;
 }
 function getPenaltyLabel(pack, penaltyIds){
@@ -344,8 +347,8 @@ function getPenaltyLabel(pack, penaltyIds){
     if(el && !el.checked) offCount++;
   });
   if(offCount === 1) return 'パック割引解消（1点外し）+15万円';
-  if(offCount === 2) return 'パック割引解消（2点外し）+50万円';
-  if(offCount >= 3) return 'パック割引解消（3点以上外し）+105万円';
+  if(offCount === 2) return 'パック割引解消（2点外し）+35万円';
+  if(offCount >= 3) return 'パック割引解消（3点以上外し）+55万円';
   return 'パック構成調整額';
 }
 var LOCKED_M = ['m01','m04','m08','m11','m21','m22','m23'];
@@ -505,6 +508,22 @@ function recalc(){
   var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
   var penalty = calcPenalty(pack, penaltyIds);
 
+  // 足場設置費（k23）の制御：外壁(k21)・屋根(k22)どちらかONなら足場も強制ON
+  if(currentTab === 'kodate'){
+    var k21el = document.getElementById('pk_k21');
+    var k22el = document.getElementById('pk_k22');
+    var k23el = document.getElementById('pk_k23');
+    if(k23el){
+      var needScaffold = (k21el && k21el.checked) || (k22el && k22el.checked);
+      if(needScaffold){
+        k23el.checked = true;
+        k23el.disabled = true;
+      } else {
+        k23el.disabled = false;
+      }
+    }
+  }
+
   // パック工事費 = パック基本総額 - 除外工事の減額金額合計
   var packActualSum = 0;
   pack.forEach(function(item){
@@ -662,10 +681,10 @@ function goToEstimate(){
   if(penalty > 0){
     rows += '<tr style="background:#fff3e0"><td>パック構成調整額</td><td>一式</td><td>+' + fmt(penalty) + ' 円</td></tr>';
   }
-  rows += '<tr class="sec"><td colspan="3">■ 諸経費・管理費</td></tr>';
-  rows += '<tr class="adj"><td>現場管理費・諸経費</td><td>一式</td><td>' + fmt(adj1) + ' 円</td></tr>';
-  rows += '<tr class="adj"><td>設計・監理費</td><td>一式</td><td>' + fmt(adj2) + ' 円</td></tr>';
-  rows += '<tr class="adj"><td>工事保険料・経費</td><td>一式</td><td>' + fmt(adj3) + ' 円</td></tr>';
+  rows += '<tr class="sec"><td colspan="3">■ 諸経費・管理費　合計 ' + fmt(adjust) + ' 円（内訳）</td></tr>';
+  rows += '<tr class="adj"><td>　└ 現場管理費・諸経費（50%）</td><td>一式</td><td>' + fmt(adj1) + ' 円</td></tr>';
+  rows += '<tr class="adj"><td>　└ 設計・監理費（30%）</td><td>一式</td><td>' + fmt(adj2) + ' 円</td></tr>';
+  rows += '<tr class="adj"><td>　└ 工事保険料・経費（20%）</td><td>一式</td><td>' + fmt(adj3) + ' 円</td></tr>';
   var areaInfo = isKodate ? '室内面積：'+area+'㎡（延床：'+getFloorArea()+'㎡）' : '専有面積：'+area+'㎡';
   if(rawArea > 0 && rawArea < minArea) areaInfo += '　※入力' + rawArea + '㎡→最低保証' + minArea + '㎡として計算';
 
