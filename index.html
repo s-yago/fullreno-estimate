@@ -311,6 +311,8 @@ var addData = [
     {id:'a11', label:'キッチンIHコンロ設置', price:60000, qty:false},
     {id:'a12', label:'キッチン吊戸棚', price:80000, qty:false},
     {id:'a13', label:'キッチンキャビネット（W1800タイプ）', price:350000, qty:false},
+    {id:'a14', label:'エコキュート設置（ガス→電気切替の場合）', price:150000, qty:false},
+    {id:'a15', label:'玄関土間収納（10㎡まで）', price:500000, qty:false},
   ]},
   {group:'戸建て専用追加', items:[
     {id:'a14', label:'2階トイレ工事（1階トイレ交換の場合）', price:170000, qty:false},
@@ -322,17 +324,29 @@ var addData = [
 
 var OTHER_COUNT = 5;
 // ペナルティ：水回り4点のうち外した数に応じて加算
-var PENALTY_ITEMS_M = ['m02','m03','m05','m06']; // UB・キッチン・洗面台・トイレ
-var PENALTY_ITEMS_K = ['k02','k03','k04','k05'];
+var PENALTY_ITEMS_M = ['m02','m03','m05','m06']; // UB・キッチン・洗面台・トイレ（マンション外壁・屋根なし）
+var PENALTY_ITEMS_K = ['k02','k03','k04','k05','k21','k22']; // UB・キッチン・洗面台・トイレ・外壁・屋根
 function calcPenalty(pack, penaltyIds){
   var offCount = 0;
   penaltyIds.forEach(function(id){
     var el = document.getElementById('pk_'+id);
     if(el && !el.checked) offCount++;
   });
-  if(offCount === 1) return 100000;
-  if(offCount === 2) return 250000;
+  if(offCount === 1) return 150000;
+  if(offCount === 2) return 500000;
+  if(offCount >= 3) return 1050000;
   return 0;
+}
+function getPenaltyLabel(pack, penaltyIds){
+  var offCount = 0;
+  penaltyIds.forEach(function(id){
+    var el = document.getElementById('pk_'+id);
+    if(el && !el.checked) offCount++;
+  });
+  if(offCount === 1) return 'パック割引解消（1点外し）+15万円';
+  if(offCount === 2) return 'パック割引解消（2点外し）+50万円';
+  if(offCount >= 3) return 'パック割引解消（3点以上外し）+105万円';
+  return 'パック構成調整額';
 }
 var LOCKED_M = ['m01','m04','m08','m11','m21','m22','m23'];
 var LOCKED_K = ['k01','k07','k10','k20','k24','k25'];
@@ -407,7 +421,7 @@ function buildAddItems(){
     return '<div><div class="group-label">' + g.group + '</div>' +
     g.items.map(function(d){
       var qtyHtml = d.qty
-        ? '<div class="item-qty" style="display:flex;align-items:center;gap:3px;flex-shrink:0"><input type="number" id="qa_'+d.id+'" value="1" min="1" max="20" onchange="recalc()" style="width:44px;font-size:12px;padding:3px;border:1px solid #ddd;border-radius:4px;text-align:center"><span style="font-size:11px;color:#888">'+(d.unit||'式')+'</span></div>'
+        ? '<div class="item-qty" style="display:flex;align-items:center;gap:3px;flex-shrink:0"><input type="number" id="qa_'+d.id+'" value="1" min="1" max="100" onchange="recalc()" style="width:44px;font-size:12px;padding:3px;border:1px solid #ddd;border-radius:4px;text-align:center"><span style="font-size:11px;color:#888">'+(d.unit||'式')+'</span></div>'
         : '<span style="width:44px"></span>';
       var priceHtml = d.freeInput
         ? '<input type="number" id="fi_'+d.id+'" value="0" min="0" onchange="recalc()" placeholder="金額入力" style="width:110px;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:4px;text-align:right"> 円'
@@ -487,22 +501,11 @@ function recalc(){
     if(el && el.checked) otherTotal += getNum('oprice_'+i,0);
   }
 
-  // パック構成調整額（水回り1点外す+10万、2点外す+20万）
+  // パック割引解消（6項目対象：UB・キッチン・洗面台・トイレ・外壁・屋根）
   var penaltyIds = currentTab==='mansion' ? PENALTY_ITEMS_M : PENALTY_ITEMS_K;
   var penalty = calcPenalty(pack, penaltyIds);
 
-  // A案：調整費はパック工事費のみで計算（追加・その他工事は別途上乗せ）
-  // パック工事費小計 = 総額 - 除外減額 + パック構成調整額
-  var packSubtotal = baseTotal - deductTotal + penalty;
-  // 調整費 = パック基本金額 - パック工事費小計（除外・追加なしの基準値との差）
-  var adjust = baseTotal - (baseTotal - deductTotal + penalty);
-  // ※adjustは deductTotal - penalty になる（除外した分が調整費に転換）
-  // 正しくは：パック実際工事費合計をpackSubtotalとし、調整費=baseTotal-packActual
-  // packActual = baseTotal - deductTotal（除外した工事の実際工事費は引かない）
-  // 調整費 = baseTotal - packActual = deductTotal - penalty
-  adjust = deductTotal > 0 ? baseTotal - (baseTotal - deductTotal) - penalty : baseTotal - baseTotal - penalty;
-  // シンプルに：全チェックONの場合の調整費を計算
-  // パック工事実際工事費合計
+  // パック工事費 = パック基本総額 - 除外工事の減額金額合計 + パック割引解消額
   var packActualSum = 0;
   pack.forEach(function(item){
     var isLocked = locked.indexOf(item.id) !== -1;
@@ -510,15 +513,16 @@ function recalc(){
     var checked = isLocked ? true : (el && el.checked);
     if(checked) packActualSum += calcItemPrice(item, area, false);
   });
-  // 調整費 = パック総額 - パック実際工事費合計 - パック構成調整額
-  adjust = baseTotal - packActualSum - penalty;
+  // パック工事費合計（表示用）= 基本総額 - 除外減額 + 割引解消
+  var packTotal = baseTotal - deductTotal + penalty;
+  // 調整費 = パック工事費合計 - パック実際工事費合計
+  var adjust = packTotal - packActualSum;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
 
-  // パック工事費合計（調整費込み）= baseTotal
-  // 工事費合計 = パック総額 + 追加工事 + その他工事
-  var workTotal = baseTotal + addTotal + otherTotal;
+  // 工事費合計 = パック工事費 + 追加工事 + その他工事
+  var workTotal = packTotal + addTotal + otherTotal;
   // 予備費は工事費合計に対して計算
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
   var buf = Math.round(workTotal * bufRate / 100);
@@ -531,11 +535,13 @@ function recalc(){
   if(penaltyEl){ penaltyEl.textContent = penalty > 0 ? '+' + fmt(penalty) + ' 円' : '0 円'; }
   var penaltyRowEl = document.getElementById('penalty-row');
   if(penaltyRowEl){ penaltyRowEl.style.display = penalty > 0 ? '' : 'none'; }
+  var penaltyLabelEl = document.getElementById('t-penalty-label');
+  if(penaltyLabelEl){ penaltyLabelEl.textContent = getPenaltyLabel(pack, penaltyIds); }
   document.getElementById('t-adjust').textContent = fmt(adjust) + ' 円';
   document.getElementById('t-adj1').textContent = fmt(adj1) + ' 円';
   document.getElementById('t-adj2').textContent = fmt(adj2) + ' 円';
   document.getElementById('t-adj3').textContent = fmt(adj3) + ' 円';
-  document.getElementById('t-subtotal').textContent = fmt(baseTotal) + ' 円';
+  document.getElementById('t-subtotal').textContent = fmt(packTotal) + ' 円';
   document.getElementById('t-add').textContent = fmt(addTotal) + ' 円';
   document.getElementById('t-other').textContent = fmt(otherTotal) + ' 円';
   var worktotalEl = document.getElementById('t-worktotal');
@@ -632,7 +638,7 @@ function goToEstimate(){
   var penaltyIds2 = isKodate ? PENALTY_ITEMS_K : PENALTY_ITEMS_M;
   var penalty = calcPenalty(isKodate ? kodatePack : mansionPack, penaltyIds2);
 
-  // A案：調整費はパック工事費のみで計算（追加・その他は別途上乗せ）
+  // パック工事費 = 基本総額 - 除外減額 + 割引解消
   var packActualTotal = 0;
   pack.forEach(function(item){
     var isLocked = locked.indexOf(item.id) !== -1;
@@ -640,14 +646,15 @@ function goToEstimate(){
     var checked = isLocked ? true : (el && el.checked);
     if(checked) packActualTotal += calcItemPrice(item, area, false);
   });
-  // 調整費 = パック総額 - パック実際工事費合計 - パック構成調整額
-  var adjust = baseTotal - packActualTotal - penalty;
+  var packTotalEst = baseTotal - deductTotal + penalty;
+  // 調整費 = パック工事費合計 - パック実際工事費合計
+  var adjust = packTotalEst - packActualTotal;
   var adj1 = Math.round(adjust * 0.5);
   var adj2 = Math.round(adjust * 0.3);
   var adj3 = adjust - adj1 - adj2;
 
   var bufRate = parseFloat(document.getElementById('bufRate').value) || 0;
-  var workTotalEst = baseTotal + addTotal + otherTotal; // 工事費合計 = パック総額 + 追加 + その他
+  var workTotalEst = packTotalEst + addTotal + otherTotal; // 工事費合計 = パック工事費 + 追加 + その他
   var buf = Math.round(workTotalEst * bufRate / 100);
   var total = workTotalEst + buf; // 概算総額 = 工事費合計 + 予備費
 
@@ -690,7 +697,7 @@ function goToEstimate(){
     '<table class="est-table">' +
     '<thead><tr><th style="width:55%">工事項目</th><th style="width:12%">数量</th><th style="width:33%">金額</th></tr></thead>' +
     '<tbody>' + rows +
-    '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費合計</td><td>' + fmt(baseTotal) + ' 円</td></tr>' +
+    '<tr class="subtotal"><td colspan="2" style="text-align:right">パック工事費合計</td><td>' + fmt(packTotalEst) + ' 円</td></tr>' +
     (addTotal+otherTotal > 0 ?
       '<tr class="subtotal"><td colspan="2" style="text-align:right">追加・その他工事費合計</td><td>+' + fmt(addTotal+otherTotal) + ' 円</td></tr>' +
       '<tr class="subtotal"><td colspan="2" style="text-align:right">工事費合計</td><td>' + fmt(workTotalEst) + ' 円</td></tr>'
