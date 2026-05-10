@@ -229,8 +229,11 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
   <div class="page" id="page-estimate">
     <button class="btn-back no-print" onclick="goBack()">← 入力画面に戻る</button>
     <div class="card" id="estimateHTML"></div>
+    <div class="no-print" style="display:flex;gap:8px;margin-bottom:.5rem;flex-wrap:wrap">
+      <button style="flex:1;padding:13px;background:#1a3a6b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer" onclick="saveCurrentEstimate()">💾 この見積もりを保存する</button>
+      <button class="btn-print" style="flex:1;margin-bottom:0" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
+    </div>
     <button class="btn-back no-print" onclick="goBack()">← 入力画面に戻る</button>
-    <button class="btn-print no-print" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
   </div>
 </div>
 
@@ -355,7 +358,8 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 <!-- 保存ダイアログ -->
 <div class="modal-bg" id="saveDlg" style="display:none">
   <div class="modal">
-    <h3>💾 名前をつけて保存</h3>
+    <h3>💾 見積もりを保存</h3>
+    <p style="font-size:11px;color:#888;margin-bottom:8px">保存名（自動入力されます。変更も可能です）</p>
     <input type="text" id="saveNameInput" placeholder="例：山田様邸 マンション73㎡">
     <div class="modal-btns">
       <button class="btn-ok" onclick="doSave()">保存する</button>
@@ -366,8 +370,9 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 
 <!-- 履歴ダイアログ -->
 <div class="modal-bg" id="historyDlg" style="display:none">
-  <div class="modal">
-    <h3>📂 保存済み一覧</h3>
+  <div class="modal" style="width:480px">
+    <h3>📂 保存した見積もり一覧</h3>
+    <p style="font-size:11px;color:#888;margin-bottom:10px">📥 読み込む：内容を復元　📋 複写：お客様名だけリセットしてたたき台に　🗑 削除</p>
     <div class="history-list" id="historyList"></div>
     <button class="btn-cancel" style="width:100%;padding:9px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;background:#888;color:#fff" onclick="closeDlg('historyDlg')">閉じる</button>
   </div>
@@ -921,18 +926,21 @@ function goToEstimate(){
 // ===== 保存・履歴機能 =====
 var SAVE_KEY = 'fullreno_saved';
 var savedCases = [];
-var currentId = null;
-var currentName = '';
 var deleteConfirmId = null;
 
 function loadSavedCases(){
   try{ var s=localStorage.getItem(SAVE_KEY); if(s) savedCases=JSON.parse(s); }catch(e){}
-  document.getElementById('historyCount').textContent = savedCases.length;
+  updateHistoryCount();
+}
+
+function updateHistoryCount(){
+  var el = document.getElementById('historyCount');
+  if(el) el.textContent = savedCases.length;
 }
 
 function persistSave(){
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(savedCases)); }catch(e){}
-  document.getElementById('historyCount').textContent = savedCases.length;
+  updateHistoryCount();
 }
 
 function getState(){
@@ -959,6 +967,9 @@ function getState(){
       price: getNum('oprice_'+i,0)
     });
   }
+  // 現在の概算総額を取得
+  var totalEl = document.getElementById('t-total');
+  var totalText = totalEl ? totalEl.textContent : '―';
   return {
     tab: currentTab,
     customerName: document.getElementById('customerName').value,
@@ -969,6 +980,7 @@ function getState(){
     packState: packState,
     addState: addState,
     otherState: otherState,
+    totalText: totalText,
   };
 }
 
@@ -1011,64 +1023,53 @@ function restoreState(state){
   recalc();
 }
 
-function updateSaveBar(){
-  var bar = document.getElementById('saveBar');
-  if(currentId && currentName){
-    bar.innerHTML = '<span class="current-name">✏️ '+currentName+'</span>' +
-      '<button class="save-bar button btn-overwrite" onclick="doOverwrite()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#2e7d32;color:#fff">💾 上書き保存</button>' +
-      '<button class="save-bar button btn-altname" onclick="openSaveDialog()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#4a7ab5;color:#fff">📋 別名保存</button>' +
-      '<button class="save-bar button btn-history" onclick="openHistory()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#555;color:#fff">📂 履歴 (<span id="historyCount">'+savedCases.length+'</span>)</button>' +
-      '<button class="save-bar button btn-new" onclick="newCase()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#888;color:#fff">＋ 新規</button>';
-  } else {
-    bar.innerHTML = '<button class="btn-save" onclick="openSaveDialog()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#1a3a6b;color:#fff">💾 保存</button>' +
-      '<button class="btn-history" onclick="openHistory()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#555;color:#fff">📂 履歴 (<span id="historyCount">'+savedCases.length+'</span>)</button>' +
-      '<button class="btn-new" onclick="newCase()" style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#888;color:#fff">＋ 新規</button>';
-  }
+// 見積書ページから呼ばれる保存関数
+function saveCurrentEstimate(){
+  var state = getState();
+  var name = (state.customerName||'お客様')+'様邸 '+(state.tab==='mansion'?'マンション':'戸建て')+' '+state.area+'㎡';
+  document.getElementById('saveNameInput').value = name;
+  document.getElementById('saveDlg').style.display = 'flex';
 }
 
 function openSaveDialog(){
   var state = getState();
-  var defaultName = (state.customerName||'お客様')+'様邸 '+(state.tab==='mansion'?'マンション':'戸建て')+state.area+'㎡';
-  document.getElementById('saveNameInput').value = defaultName;
+  var name = (state.customerName||'お客様')+'様邸 '+(state.tab==='mansion'?'マンション':'戸建て')+' '+state.area+'㎡';
+  document.getElementById('saveNameInput').value = name;
   document.getElementById('saveDlg').style.display = 'flex';
 }
 
 function doSave(){
-  var name = document.getElementById('saveNameInput').value || '無題';
-  var newCase2 = { id: Date.now(), name: name, savedAt: new Date().toLocaleString('ja-JP'), data: getState() };
-  savedCases = [newCase2].concat(savedCases).slice(0,30);
-  currentId = newCase2.id; currentName = name;
+  var name = document.getElementById('saveNameInput').value.trim() || '無題';
+  var state = getState();
+  var entry = {
+    id: Date.now(),
+    name: name,
+    savedAt: new Date().toLocaleString('ja-JP'),
+    type: state.tab==='mansion'?'マンション':'戸建て',
+    totalText: state.totalText||'―',
+    data: state
+  };
+  savedCases = [entry].concat(savedCases).slice(0,50);
   persistSave();
   closeDlg('saveDlg');
-  updateSaveBar();
-}
-
-function doOverwrite(){
-  savedCases = savedCases.map(function(item){
-    return item.id===currentId ? Object.assign({},item,{data:getState(),savedAt:new Date().toLocaleString('ja-JP')}) : item;
-  });
-  persistSave();
-  alert('上書き保存しました！');
+  alert('「'+name+'」を保存しました！');
 }
 
 function newCase(){
   if(!confirm('現在の内容をクリアして新規作成しますか？')) return;
-  currentId=null; currentName='';
   document.getElementById('customerName').value='';
   document.getElementById('address').value='';
   document.getElementById('areaInput').value=73;
   document.getElementById('floorAreaInput').value=105;
   document.getElementById('bufRate').value=30;
   setTab('mansion');
-  var pack=mansionPack;
-  pack.forEach(function(item){ var el=document.getElementById('pk_'+item.id); if(el) el.checked=true; });
+  mansionPack.forEach(function(item){ var el=document.getElementById('pk_'+item.id); if(el) el.checked=true; });
   addData.forEach(function(g){ g.items.forEach(function(d){ var el=document.getElementById('ad_'+d.id); if(el) el.checked=false; }); });
   for(var i=1;i<=OTHER_COUNT;i++){
     var el=document.getElementById('ot_'+i); if(el) el.checked=false;
     var nel=document.getElementById('oname_'+i); if(nel) nel.value='';
     var pel=document.getElementById('oprice_'+i); if(pel) pel.value=0;
   }
-  updateSaveBar();
   recalc();
 }
 
@@ -1086,18 +1087,35 @@ function renderHistory(){
   }
   list.innerHTML = savedCases.map(function(item){
     var isDel = deleteConfirmId===item.id;
+    var typeLabel = item.type||'―';
+    var total = item.totalText||'―';
     return '<div class="history-item">' +
       '<div class="history-item-name">'+item.name+'</div>' +
-      '<div class="history-item-date">保存日時：'+item.savedAt+'</div>' +
+      '<div class="history-item-date" style="display:flex;gap:12px;flex-wrap:wrap">' +
+        '<span>'+typeLabel+'</span>' +
+        '<span style="color:#2e7d32;font-weight:700">'+total+'</span>' +
+        '<span style="color:#aaa">'+item.savedAt+'</span>' +
+      '</div>' +
       '<div class="history-item-btns">' +
-      '<button class="btn-load" onclick="loadCase('+item.id+')">📥 読み込む</button>' +
-      '<button class="btn-copy" onclick="copyCase('+item.id+')" style="flex:1;padding:5px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#185FA5;color:#fff">📄 複写</button>' +
-      (isDel
-        ? '<button class="btn-del-confirm" onclick="deleteCase('+item.id+')">本当に削除</button><button class="btn-del" onclick="cancelDelete()">キャンセル</button>'
-        : '<button class="btn-del" onclick="confirmDelete('+item.id+')">🗑 削除</button>'
-      ) +
+        '<button class="btn-load" onclick="loadCase('+item.id+')">📥 読み込む</button>' +
+        '<button onclick="copyCase('+item.id+')" style="flex:1;padding:5px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#185FA5;color:#fff">📋 複写して新規</button>' +
+        (isDel
+          ? '<button style="flex:1;padding:5px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#8b0000;color:#fff" onclick="deleteCase('+item.id+')">本当に削除</button><button class="btn-del" onclick="cancelDelete()">キャンセル</button>'
+          : '<button class="btn-del" onclick="confirmDelete('+item.id+')">🗑️ 削除</button>'
+        ) +
       '</div></div>';
   }).join('');
+}
+
+function loadCase(id){
+  var item = savedCases.filter(function(c){ return c.id===id; })[0];
+  if(!item) return;
+  restoreState(item.data);
+  closeDlg('historyDlg');
+  // 入力ページへ戻す
+  document.getElementById('page-input').classList.add('active');
+  document.getElementById('page-estimate').classList.remove('active');
+  window.scrollTo(0,0);
 }
 
 function copyCase(id){
@@ -1105,30 +1123,23 @@ function copyCase(id){
   if(!item) return;
   var copied = JSON.parse(JSON.stringify(item.data));
   copied.customerName = '';
-  copied.address = '';
-  currentId = null;
-  currentName = '';
   restoreState(copied);
-  updateSaveBar();
   closeDlg('historyDlg');
-  alert('複写しました。お客様名・住所を入力して保存してください。');
-}
-
-function loadCase(id){
-  var item = savedCases.filter(function(c){ return c.id===id; })[0];
-  if(!item) return;
-  currentId=item.id; currentName=item.name;
-  restoreState(item.data);
-  updateSaveBar();
-  closeDlg('historyDlg');
+  document.getElementById('page-input').classList.add('active');
+  document.getElementById('page-estimate').classList.remove('active');
+  window.scrollTo(0,0);
+  setTimeout(function(){
+    document.getElementById('customerName').focus();
+    alert('複写しました！\nお客様名を入力して、見積書を作成・保存してください。');
+  }, 100);
 }
 
 function confirmDelete(id){ deleteConfirmId=id; renderHistory(); }
 function cancelDelete(){ deleteConfirmId=null; renderHistory(); }
 
 function deleteCase(id){
+  if(!confirm('この見積もりを削除しますか？')) return;
   savedCases = savedCases.filter(function(c){ return c.id!==id; });
-  if(currentId===id){ currentId=null; currentName=''; updateSaveBar(); }
   persistSave();
   deleteConfirmId=null;
   renderHistory();
@@ -1143,7 +1154,6 @@ buildPackItems();
 buildKodatePackItems();
 buildAddItems();
 buildOtherItems();
-updateSaveBar();
 recalc();
 </script>
 </body>
