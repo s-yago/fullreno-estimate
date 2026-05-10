@@ -249,9 +249,9 @@ var mansionPack = [
   {id:'m03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'m04', label:'UB・システムキッチン搬入費用', type:'fix', base:164000, deduct:164000, locked:true},
   {id:'m05', label:'洗面台新規設置工事（タカラスタンダード・オンディーヌ）', type:'fix', base:166000, deduct:166000, locked:false},
-  {id:'m06', label:'トイレ新規設置工事（TOTO・ウォシュレット）', type:'fix', base:209000, deduct:209000, locked:false},
+  {id:'m06', label:'トイレ新規設置工事（TOTO・ウォシュレット）※住宅設備4点交換', type:'fix', base:209000, deduct:209000, locked:false},
   {id:'m07', label:'ガス給湯機（20号）工事', type:'fix', base:200000, deduct:200000, locked:false},
-  {id:'m08', label:'給排水・ガス配管工事', type:'var_sqm', base:556000, deduct:556000, baseArea:73, unit:13820, unitDeduct:13820, locked:true},
+  {id:'m08', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:556000, deduct:556000, baseArea:73, unit:13820, unitDeduct:13820, locked:true},
   {id:'m09', label:'全室フロアタイル床上貼り工事', type:'var_sqm', base:825000, deduct:825000, baseArea:73, unit:11300, unitDeduct:11300, locked:false},
   {id:'m10', label:'クロス工事（壁・天井）', type:'var_sqm', base:767000, deduct:767000, baseArea:73, unit:10500, unitDeduct:10500, locked:false},
   {id:'m11', label:'電気工事（配線・スイッチ・コンセント）', type:'var_sqm', base:348000, deduct:348000, baseArea:73, unit:10000, unitDeduct:10000, locked:true},
@@ -261,9 +261,9 @@ var mansionPack = [
   {id:'m14a', label:'トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
   {id:'m14b', label:'洗面脱衣室CF床張り替え', type:'fix', base:50000, deduct:50000, locked:false},
   {id:'m14', label:'換気扇交換（水回りのみ）', type:'fix', base:34000, deduct:34000, locked:false},
-  {id:'m15', label:'畳表替え（6帖）', type:'fix', base:60000, deduct:60000, locked:false},
-  {id:'m16', label:'ふすま（6面・仏間戸除く）・障子（2枚）張替工事', type:'fix', base:70000, deduct:70000, locked:false},
-  {id:'m17', label:'網戸貼替', type:'var_5sqm', base:65000, deduct:65000, baseArea:73, unit:5000, unitDeduct:5000, locked:false},
+  {id:'m15', label:'畳表替え（1室6帖まで）', type:'fix', base:60000, deduct:60000, locked:false},
+  {id:'m16', label:'ふすま張替（仏間戸除く。6面まで）・障子張替', type:'fix', base:70000, deduct:70000, locked:false},
+  {id:'m17', label:'全室網戸貼替', type:'var_5sqm', base:65000, deduct:65000, baseArea:73, unit:5000, unitDeduct:5000, locked:false},
   {id:'m18', label:'カギ交換（上下2か所）', type:'fix', base:80000, deduct:80000, locked:false},
   {id:'m19', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:520000, deduct:520000, locked:false},
   {id:'m20', label:'ペアガラス内窓設置（4か所）', type:'fix', base:400000, deduct:400000, locked:false},
@@ -271,7 +271,7 @@ var mansionPack = [
   {id:'m22', label:'養生費', type:'fix', base:106000, deduct:106000, locked:true},
   {id:'m23', label:'資材運搬費', type:'fix', base:70000, deduct:70000, locked:true},
   {id:'m24', label:'建材費用', type:'var_sqm', base:174000, deduct:174000, baseArea:73, unit:2380, unitDeduct:2380, locked:false},
-  {id:'m25', label:'間取り変更（壁撤去・新設1か所）', type:'fix', base:330000, deduct:330000, locked:false},
+  {id:'m25', label:'間取り変更（壁撤去等1か所のみ）', type:'fix', base:330000, deduct:330000, locked:false},
 ];
 
 // ===== 戸建て パック工事 =====
@@ -286,7 +286,7 @@ var kodatePack = [
   {id:'k05c', label:'2階トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
   {id:'k06', label:'ガス給湯機（24号）工事', type:'fix', base:170000, deduct:170000, locked:false},
   {id:'k07', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:610000, deduct:610000, baseArea:105, unit:21200, unitDeduct:21200, locked:true},
-  {id:'k08', label:'全室フローリング床貼替・巾木交換工事', type:'var_sqm', base:1187000, deduct:1187000, baseArea:105, unit:11300, unitDeduct:11300, locked:false},
+  {id:'k08', label:'全室フローリング床上貼り・巾木交換工事', type:'var_sqm', base:1187000, deduct:1187000, baseArea:105, unit:11300, unitDeduct:11300, locked:false},
   {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1160000, deduct:1160000, baseArea:105, unit:10500, unitDeduct:10500, locked:false},
   {id:'k10', label:'電気工事（配線・スイッチ・コンセント）', type:'var_sqm', base:494000, deduct:494000, baseArea:105, unit:15000, unitDeduct:15000, locked:true},
   {id:'k11', label:'照明器具交換（全灯LED）', type:'var_5sqm', base:350000, deduct:350000, baseArea:105, unit:10000, unitDeduct:10000, locked:false},
@@ -294,9 +294,9 @@ var kodatePack = [
   {id:'k12b', label:'大工工事', type:'fix', base:210000, deduct:210000, locked:true},
   {id:'k13b', label:'洗面脱衣室CF床張り替え', type:'fix', base:50000, deduct:50000, locked:false},
   {id:'k13', label:'換気扇交換（固定）', type:'fix', base:125000, deduct:125000, locked:false},
-  {id:'k14', label:'畳表替え（6帖）', type:'fix', base:60000, deduct:60000, locked:false},
-  {id:'k15', label:'ふすま（6面・仏間戸除く）・障子（2枚）張替工事', type:'fix', base:70000, deduct:70000, locked:false},
-  {id:'k16', label:'網戸貼替', type:'var_5sqm', base:65000, deduct:65000, baseArea:105, unit:5000, unitDeduct:5000, locked:false},
+  {id:'k14', label:'畳表替え（1室6帖まで）', type:'fix', base:60000, deduct:60000, locked:false},
+  {id:'k15', label:'ふすま張替（仏間戸除く。6面まで）・障子張替', type:'fix', base:70000, deduct:70000, locked:false},
+  {id:'k16', label:'全室網戸貼替', type:'var_5sqm', base:65000, deduct:65000, baseArea:105, unit:5000, unitDeduct:5000, locked:false},
   {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:80000, deduct:80000, locked:false},
   {id:'k18', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:570000, deduct:570000, locked:false},
   {id:'k19', label:'ペアガラス内窓設置（8か所）', type:'fix', base:780000, deduct:780000, locked:false},
@@ -307,7 +307,7 @@ var kodatePack = [
   {id:'k24', label:'養生費', type:'fix', base:100000, deduct:100000, locked:true},
   {id:'k25', label:'資材運搬費', type:'fix', base:70000, deduct:70000, locked:true},
   {id:'k26', label:'建材費用', type:'var_sqm', base:250000, deduct:250000, baseArea:105, unit:2380, unitDeduct:2380, locked:false},
-  {id:'k27', label:'間取り変更（壁撤去・新設1か所）', type:'fix', base:330000, deduct:330000, locked:false},
+  {id:'k27', label:'間取り変更（壁撤去等1か所のみ）', type:'fix', base:330000, deduct:330000, locked:false},
 ];
 
 // ===== 追加工事 =====
@@ -338,6 +338,7 @@ var addData = [
     {id:'a15', label:'外壁塗装追加（200㎡超過分）', price:7700, qty:true, unit:'㎡'},
     {id:'a16', label:'屋根塗装追加（70㎡超過分）', price:13000, qty:true, unit:'㎡'},
     {id:'a17', label:'カーポート設置（2台分）', price:0, qty:false, freeInput:true},
+    {id:'a19', label:'断熱玄関扉', price:650000, qty:false},
   ]},
 ];
 
