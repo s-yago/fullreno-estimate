@@ -131,7 +131,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 
     <!-- 保存バー -->
     <div class="save-bar no-print" id="saveBar">
-      <button class="btn-save" id="btnSave" onclick="openSaveDialog()">💾 保存</button>
+      <button class="btn-save" onclick="openSaveDialog()">💾 保存</button>
       <button class="btn-history" onclick="openHistory()">📂 履歴 (<span id="historyCount">0</span>)</button>
       <button class="btn-new" onclick="newCase()">＋ 新規</button>
     </div>
@@ -397,8 +397,9 @@ var mansionPack = [
   {id:'m11', label:'電気工事（配線・スイッチ・コンセント）', type:'var_sqm', base:348000, deduct:348000, baseArea:73, unit:18000, unitDeduct:18000, locked:true},
   {id:'m12', label:'照明器具交換（全灯LED）', type:'var_5sqm', base:350000, deduct:350000, baseArea:73, unit:10000, unitDeduct:10000, locked:false},
   {id:'m13', label:'建具全箇所交換工事（既存枠利用 リビングドア×1、入口ドア×5枚）', type:'fix', base:375000, deduct:375000, locked:false},
+  {id:'m13c', label:'キッチンボード復旧工事', type:'fix', base:50000, deduct:50000, locked:false, packTag:'K'},
   {id:'m13b', label:'大工工事', type:'fix', base:306000, deduct:306000, locked:true},
-  {id:'m14a', label:'トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
+  {id:'m14a', label:'トイレCF床張り替え', type:'fix', base:36000, deduct:36000, locked:false},
   {id:'m14b', label:'洗面脱衣室CF床張り替え', type:'fix', base:50000, deduct:50000, locked:false},
   {id:'m14', label:'換気扇交換（水回りのみ）', type:'fix', base:34000, deduct:34000, locked:false},
   {id:'m15', label:'畳表替え（1室6帖まで）', type:'fix', base:60000, deduct:60000, locked:false},
@@ -407,8 +408,8 @@ var mansionPack = [
   {id:'m18', label:'カギ交換（上下2か所）', type:'fix', base:80000, deduct:80000, locked:false},
   {id:'m19', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:520000, deduct:520000, locked:false},
   {id:'m20', label:'ペアガラス内窓設置（4か所）', type:'fix', base:400000, deduct:400000, locked:false},
-  {id:'m21', label:'ハウスクリーニング', type:'var_sqm', base:118000, deduct:118000, baseArea:73, unit:1000, unitDeduct:1000, locked:true},
-  {id:'m22', label:'養生費', type:'fix', base:106000, deduct:106000, locked:true},
+  {id:'m21', label:'ハウスクリーニング', type:'var_sqm', base:112000, deduct:112000, baseArea:73, unit:1000, unitDeduct:1000, locked:true},
+  {id:'m22', label:'養生費', type:'fix', base:56000, deduct:56000, locked:true},
   {id:'m23', label:'資材運搬費', type:'fix', base:70000, deduct:70000, locked:true},
   {id:'m24', label:'建材費用', type:'var_sqm', base:174000, deduct:174000, baseArea:73, unit:2380, unitDeduct:2380, locked:true},
   {id:'m25', label:'間取り変更（壁撤去等1か所のみ）', type:'fix', base:330000, deduct:330000, locked:false},
@@ -422,8 +423,8 @@ var kodatePack = [
   {id:'k04', label:'洗面台新規設置工事（タカラスタンダード・リフレシオ）', type:'fix', base:166000, deduct:166000, locked:false},
   {id:'k05', label:'トイレ新規設置工事 1階（TOTO・ウォシュレットZR-1）', type:'fix', base:209000, deduct:209000, locked:false},
   {id:'k05b', label:'トイレ新規設置工事 2階（TOTO・ウォシュレットZR-1）', type:'fix', base:209000, deduct:209000, locked:false},
-  {id:'k13a', label:'1階トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
-  {id:'k05c', label:'2階トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
+  {id:'k13a', label:'1階トイレCF床張り替え', type:'fix', base:36000, deduct:36000, locked:false},
+  {id:'k05c', label:'2階トイレCF床張り替え', type:'fix', base:36000, deduct:36000, locked:false},
   {id:'k06', label:'ガス給湯機（24号）工事', type:'fix', base:170000, deduct:170000, locked:false},
   {id:'k07', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:500000, deduct:500000, baseArea:105, unit:9200, unitDeduct:9200, locked:true},
   {id:'k08', label:'全室フローリング床上貼り・巾木交換工事', type:'var_sqm', base:1187000, deduct:1187000, baseArea:105, unit:11300, unitDeduct:11300, locked:false},
@@ -431,6 +432,7 @@ var kodatePack = [
   {id:'k10', label:'電気工事（配線・スイッチ・コンセント）', type:'var_sqm', base:494000, deduct:494000, baseArea:105, unit:20620, unitDeduct:20620, locked:true},
   {id:'k11', label:'照明器具交換（全灯LED）', type:'var_5sqm', base:350000, deduct:350000, baseArea:105, unit:10000, unitDeduct:10000, locked:false},
   {id:'k12', label:'建具全箇所交換工事（既存枠利用 リビングドア×1、入口ドア×7枚）', type:'fix', base:495000, deduct:495000, locked:false},
+  {id:'k12c', label:'キッチンボード復旧工事', type:'fix', base:50000, deduct:50000, locked:false, packTag:'K'},
   {id:'k12b', label:'大工工事', type:'fix', base:320000, deduct:320000, locked:true},
   {id:'k13b', label:'洗面脱衣室CF床張り替え', type:'fix', base:50000, deduct:50000, locked:false},
   {id:'k13', label:'換気扇交換（固定）', type:'fix', base:125000, deduct:125000, locked:false},
@@ -440,11 +442,11 @@ var kodatePack = [
   {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:80000, deduct:80000, locked:false},
   {id:'k18', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:570000, deduct:570000, locked:false},
   {id:'k19', label:'ペアガラス内窓設置（8か所）', type:'fix', base:780000, deduct:780000, locked:false},
-  {id:'k20', label:'ハウスクリーニング', type:'var_sqm', base:150000, deduct:150000, baseArea:105, unit:1000, unitDeduct:1000, locked:true},
+  {id:'k20', label:'ハウスクリーニング', type:'var_sqm', base:138000, deduct:138000, baseArea:105, unit:1000, unitDeduct:1000, locked:true},
   {id:'k21', label:'外壁塗装工事（200㎡まで）', type:'fix', base:1235000, deduct:1235000, locked:false},
   {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:400000, deduct:400000, locked:false},
   {id:'k23', label:'足場設置・撤去費（外壁・屋根工事時は必須）', type:'fix', base:500000, deduct:500000, locked:false},
-  {id:'k24', label:'養生費', type:'fix', base:100000, deduct:100000, locked:true},
+  {id:'k24', label:'養生費', type:'fix', base:50000, deduct:50000, locked:true},
   {id:'k25', label:'資材運搬費', type:'fix', base:70000, deduct:70000, locked:true},
   {id:'k26', label:'建材費用', type:'var_sqm', base:250000, deduct:250000, baseArea:105, unit:2380, unitDeduct:2380, locked:true},
   {id:'k27', label:'間取り変更（壁撤去等1か所のみ）', type:'fix', base:330000, deduct:330000, locked:false},
@@ -476,7 +478,7 @@ var addData = [
   {group:'戸建て専用追加', items:[
     {id:'a15', label:'外壁塗装追加（200㎡超過分）', price:7700, qty:true, unit:'㎡'},
     {id:'a16', label:'屋根塗装追加（70㎡超過分）', price:13000, qty:true, unit:'㎡'},
-    {id:'a17', label:'カーポート設置（2台分）', price:1000000, qty:false},
+    {id:'a17', label:'カーポート設置（2台分・積雪1.5mタイプ）', price:1000000, qty:false},
     {id:'a19', label:'断熱玄関扉', price:650000, qty:false},
   ]},
 ];
@@ -547,18 +549,20 @@ function buildPackItems(){
   var area = getArea();
   var pack = currentTab==='mansion' ? mansionPack : kodatePack;
   var locked = currentTab==='mansion' ? LOCKED_M : LOCKED_K;
+  var kitchenId = currentTab==='mansion' ? 'pk_m03' : 'pk_k03';
   var html = '';
   pack.forEach(function(item){
     var price = calcItemPrice(item, area);
     var isLocked = locked.indexOf(item.id) !== -1;
+    var packTagAttr = item.packTag ? ' data-packtag="'+item.packTag+'"' : '';
     if(isLocked){
-      html += '<div class="item-row">' +
+      html += '<div class="item-row"'+packTagAttr+'>' +
         '<span class="lock-icon" title="必須工事">🔒</span>' +
         '<span class="item-label" style="color:#888">' + item.label + '<small style="color:#aaa;margin-left:4px">（必須）</small></span>' +
         '<span class="item-price price-gray" id="pkp_'+item.id+'">' + fmt(price) + ' 円</span>' +
         '</div>';
     } else {
-      html += '<div class="item-row">' +
+      html += '<div class="item-row"'+packTagAttr+'>' +
         '<input type="checkbox" id="pk_'+item.id+'" checked onchange="recalc()">' +
         '<label class="item-label" for="pk_'+item.id+'">' + item.label + '</label>' +
         '<span class="item-price price-red" id="pkp_'+item.id+'">' + fmt(price) + ' 円</span>' +
@@ -566,6 +570,18 @@ function buildPackItems(){
     }
   });
   document.getElementById('packItems').innerHTML = html;
+  syncKitchenTag();
+}
+
+function syncKitchenTag(){
+  var kitchenId = currentTab==='mansion' ? 'pk_m03' : 'pk_k03';
+  var kitchenEl = document.getElementById(kitchenId);
+  var kitchenOn = kitchenEl ? kitchenEl.checked : true;
+  document.querySelectorAll('#packItems [data-packtag="K"]').forEach(function(row){
+    row.style.display = kitchenOn ? '' : 'none';
+    var cb = row.querySelector('input[type=checkbox]');
+    if(cb) cb.checked = kitchenOn ? cb.checked : false;
+  });
 }
 
 function buildKodatePackItems(){
@@ -612,6 +628,7 @@ function buildOtherItems(){
 function getNum(id, def){ var el=document.getElementById(id); if(!el) return def||0; var v=parseFloat(el.value); return isNaN(v)?def||0:v; }
 
 function recalc(){
+  syncKitchenTag();
   var area = getArea();
   var rawArea = getRawArea();
   var pack = currentTab==='mansion' ? mansionPack : kodatePack;
@@ -1074,12 +1091,27 @@ function renderHistory(){
       '<div class="history-item-date">保存日時：'+item.savedAt+'</div>' +
       '<div class="history-item-btns">' +
       '<button class="btn-load" onclick="loadCase('+item.id+')">📥 読み込む</button>' +
+      '<button class="btn-copy" onclick="copyCase('+item.id+')" style="flex:1;padding:5px;font-size:11px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:#185FA5;color:#fff">📄 複写</button>' +
       (isDel
         ? '<button class="btn-del-confirm" onclick="deleteCase('+item.id+')">本当に削除</button><button class="btn-del" onclick="cancelDelete()">キャンセル</button>'
         : '<button class="btn-del" onclick="confirmDelete('+item.id+')">🗑 削除</button>'
       ) +
       '</div></div>';
   }).join('');
+}
+
+function copyCase(id){
+  var item = savedCases.filter(function(c){ return c.id===id; })[0];
+  if(!item) return;
+  var copied = JSON.parse(JSON.stringify(item.data));
+  copied.customerName = '';
+  copied.address = '';
+  currentId = null;
+  currentName = '';
+  restoreState(copied);
+  updateSaveBar();
+  closeDlg('historyDlg');
+  alert('複写しました。お客様名・住所を入力して保存してください。');
 }
 
 function loadCase(id){
