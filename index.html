@@ -244,14 +244,14 @@ var K_BASE_AREA = 105, K_MIN_AREA = 85, K_MIN_TOTAL = 12200000, K_BASE_TOTAL = 1
 // type: fix=固定, var_sqm=㎡変動, var_5sqm=5㎡変動
 // locked=true: 必須（チェック不可）
 var mansionPack = [
-  {id:'m01', label:'解体・撤去・産廃処理工事', type:'fix', base:790000, deduct:790000, locked:true},
+  {id:'m01', label:'解体・撤去・産廃処理工事', type:'var_sqm', base:790000, deduct:790000, baseArea:73, unit:8000, unitDeduct:8000, locked:true},
   {id:'m02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1147000, deduct:1147000, locked:false},
   {id:'m03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'m04', label:'UB・システムキッチン搬入費用', type:'fix', base:164000, deduct:164000, locked:true},
   {id:'m05', label:'洗面台新規設置工事（タカラスタンダード・オンディーヌ）', type:'fix', base:166000, deduct:166000, locked:false},
   {id:'m06', label:'トイレ新規設置工事（TOTO・ウォシュレット）※住宅設備4点交換', type:'fix', base:209000, deduct:209000, locked:false},
   {id:'m07', label:'ガス給湯機（20号）工事', type:'fix', base:200000, deduct:200000, locked:false},
-  {id:'m08', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:556000, deduct:556000, baseArea:73, unit:13820, unitDeduct:13820, locked:true},
+  {id:'m08', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:556000, deduct:556000, baseArea:73, unit:5820, unitDeduct:5820, locked:true},
   {id:'m09', label:'全室フロアタイル床上貼り工事', type:'var_sqm', base:825000, deduct:825000, baseArea:73, unit:11300, unitDeduct:11300, locked:false},
   {id:'m10', label:'クロス工事（壁・天井）', type:'var_sqm', base:767000, deduct:767000, baseArea:73, unit:10500, unitDeduct:10500, locked:false},
   {id:'m11', label:'電気工事（配線・スイッチ・コンセント）', type:'var_sqm', base:348000, deduct:348000, baseArea:73, unit:10000, unitDeduct:10000, locked:true},
@@ -276,7 +276,7 @@ var mansionPack = [
 
 // ===== 戸建て パック工事 =====
 var kodatePack = [
-  {id:'k01', label:'解体・撤去・産廃処理工事', type:'fix', base:1100000, deduct:1100000, locked:true},
+  {id:'k01', label:'解体・撤去・産廃処理工事', type:'var_sqm', base:1100000, deduct:1100000, baseArea:105, unit:12000, unitDeduct:12000, locked:true},
   {id:'k02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1027000, deduct:1027000, locked:false},
   {id:'k03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'k04', label:'洗面台新規設置工事（タカラスタンダード・オンディーヌ）', type:'fix', base:166000, deduct:166000, locked:false},
@@ -285,7 +285,7 @@ var kodatePack = [
   {id:'k13a', label:'1階トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
   {id:'k05c', label:'2階トイレCF床張り替え', type:'fix', base:30000, deduct:30000, locked:false},
   {id:'k06', label:'ガス給湯機（24号）工事', type:'fix', base:170000, deduct:170000, locked:false},
-  {id:'k07', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:610000, deduct:610000, baseArea:105, unit:21200, unitDeduct:21200, locked:true},
+  {id:'k07', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:610000, deduct:610000, baseArea:105, unit:9200, unitDeduct:9200, locked:true},
   {id:'k08', label:'全室フローリング床上貼り・巾木交換工事', type:'var_sqm', base:1187000, deduct:1187000, baseArea:105, unit:11300, unitDeduct:11300, locked:false},
   {id:'k09', label:'クロス工事（壁・天井）', type:'var_sqm', base:1160000, deduct:1160000, baseArea:105, unit:10500, unitDeduct:10500, locked:false},
   {id:'k10', label:'電気工事（配線・スイッチ・コンセント）', type:'var_sqm', base:494000, deduct:494000, baseArea:105, unit:15000, unitDeduct:15000, locked:true},
