@@ -67,6 +67,26 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 .warn-note p::before{content:"⚠ "}
 .save-bar{display:flex;gap:6px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
 .save-bar button{padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer}
+.btn-help{background:#f57c00;color:#fff;padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer}
+.help-modal{background:#fff;border-radius:10px;width:700px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,.3);overflow:hidden}
+.help-modal-header{background:#2e7d32;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.help-modal-header h3{font-size:15px;font-weight:700;margin:0}
+.help-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.help-body{overflow-y:auto;padding:20px;flex:1}
+.help-sec{margin-bottom:20px}
+.help-sec h4{font-size:13px;font-weight:700;color:#2e7d32;border-left:4px solid #2e7d32;padding-left:8px;margin-bottom:10px;margin-top:0}
+.help-sec h5{font-size:12px;font-weight:700;color:#555;margin:10px 0 5px;background:#f5f5f5;padding:4px 8px;border-radius:4px}
+.help-sec p,.help-sec li{font-size:12px;color:#444;line-height:1.8;margin-bottom:3px}
+.help-sec ul{padding-left:1.4em;margin-bottom:6px}
+.help-tbl{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 12px}
+.help-tbl th{background:#2e7d32;color:#fff;padding:5px 8px;text-align:left;font-weight:600}
+.help-tbl td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:top}
+.help-tbl tr:nth-child(even) td{background:#f9f9f9}
+.hbadge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;margin-right:3px;vertical-align:middle}
+.hb-lock{background:#fff3e0;color:#e65100;border:1px solid #ffcc02}
+.hb-chk{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+.hb-add{background:#e3f2fd;color:#1565c0;border:1px solid #90caf9}
+.help-warn{background:#fff3e0;border:1px solid #ffcc02;border-radius:6px;padding:8px 12px;font-size:11px;color:#e65100;margin:8px 0}
 .btn-save{background:#1a3a6b;color:#fff}
 .btn-overwrite{background:#2e7d32;color:#fff}
 .btn-altname{background:#4a7ab5;color:#fff}
@@ -99,7 +119,9 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 </head>
 <body>
 <div class="app">
-  <h1>🏠 フルリノベーション 概算見積もりシステム</h1>
+  <h1>🏠 フルリノベーション 概算見積もりシステム
+  <button class="btn-help no-print" onclick="openHelp()" style="margin-left:12px;font-size:11px;vertical-align:middle">❓ 使い方</button>
+</h1>
 
   <div class="page active" id="page-input">
     <div class="tabs no-print">
@@ -212,6 +234,125 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
   </div>
 </div>
 
+<!-- マニュアルモーダル -->
+<div class="modal-bg no-print" id="helpDlg" style="display:none;z-index:2000">
+  <div class="help-modal">
+    <div class="help-modal-header">
+      <h3>📖 フルリノベーション見積もりシステム 使い方マニュアル</h3>
+      <button class="help-close" onclick="closeDlg('helpDlg')">✕</button>
+    </div>
+    <div class="help-body">
+
+      <div class="help-sec">
+        <h4>① 基本的な使い方の流れ</h4>
+        <ul>
+          <li>上部タブで <strong>「マンション」または「戸建て」</strong> を選択する</li>
+          <li>お客様名・物件住所（任意）を入力する</li>
+          <li>専有面積（または室内面積）を入力する</li>
+          <li>パック工事内容のチェックを確認・調整する</li>
+          <li>必要な追加工事があればチェックを入れる</li>
+          <li>予備費の%を確認・必要に応じて変更する</li>
+          <li>「<strong>見積書を作成する</strong>」ボタンをクリック</li>
+          <li>見積書画面で内容を確認し、印刷またはPDF保存する</li>
+        </ul>
+      </div>
+
+      <div class="help-sec">
+        <h4>② 面積入力について</h4>
+        <table class="help-tbl">
+          <tr><th>種別</th><th>最低保証面積</th><th>基準面積・金額</th><th>増減単価</th></tr>
+          <tr><td>マンション</td><td>61㎡（858万円）</td><td>73㎡・930万円</td><td>±6万円/㎡</td></tr>
+          <tr><td>戸建て</td><td>85㎡（1,220万円）</td><td>105㎡・1,360万円</td><td>±7万円/㎡</td></tr>
+        </table>
+        <p>※ 入力面積が最低保証面積を下回る場合は自動的に最低保証面積で計算されます。</p>
+      </div>
+
+      <div class="help-sec">
+        <h4>③ パック工事内容について</h4>
+        <h5>チェックの種類</h5>
+        <ul>
+          <li><span class="hbadge hb-lock">🔒 必須</span> 外すことができない工事（解体・配管・電気・クリーニング等）</li>
+          <li><span class="hbadge hb-chk">☑ チェックON</span> 工事に含まれる（チェックを外すと減額）</li>
+          <li><span class="hbadge hb-chk">☐ チェックOFF</span> 工事から除外（パック工事費から減額金額を引く）</li>
+        </ul>
+        <h5>パック割引解消について</h5>
+        <p>UB・キッチン・洗面台・トイレ・外壁塗装・屋根塗装の6項目のうち外した数に応じて以下の金額が加算されます。</p>
+        <table class="help-tbl">
+          <tr><th>外した点数</th><th>パック割引解消額</th></tr>
+          <tr><td>1点</td><td>+150,000円</td></tr>
+          <tr><td>2点</td><td>+350,000円</td></tr>
+          <tr><td>3点以上</td><td>+550,000円</td></tr>
+        </table>
+        <div class="help-warn">⚠ 足場設置費は外壁塗装・屋根塗装の両方を外した場合のみ外せます。片方でも残す場合は自動的に必須になります。</div>
+      </div>
+
+      <div class="help-sec">
+        <h4>④ 追加工事について</h4>
+        <ul>
+          <li><span class="hbadge hb-add">追加</span> チェックを入れると金額が工事費合計に加算されます</li>
+          <li>台数・帖数・か所数を入力できる項目は数量を変更できます</li>
+          <li>カーポートなど一部の項目は金額を直接入力します</li>
+          <li>「戸建て専用追加」の項目はマンションには表示されません</li>
+        </ul>
+      </div>
+
+      <div class="help-sec">
+        <h4>⑤ 予備費について</h4>
+        <p>予備費は想定外の工事や追加工事が発生した際のための費用です。デフォルトは<strong>30%</strong>です。</p>
+        <p>お客様から「予備費が多い」と言われた場合はパーセントを変更できます（0〜100%）。</p>
+        <p>予備費は工事費合計に対して計算され、概算総額に上乗せされます。</p>
+      </div>
+
+      <div class="help-sec">
+        <h4>⑥ 金額の仕組み</h4>
+        <table class="help-tbl">
+          <tr><th>項目</th><th>説明</th></tr>
+          <tr><td>パック基本金額</td><td>面積に応じて自動計算された基本工事費</td></tr>
+          <tr><td>パック除外工事（減額）</td><td>チェックを外した工事の減額合計</td></tr>
+          <tr><td>諸経費・管理費</td><td>現場管理費50%・設計監理費30%・工事保険料20%の内訳（合計が表示金額）</td></tr>
+          <tr><td>パック工事費合計</td><td>上記を合算したパック工事の合計金額</td></tr>
+          <tr><td>追加工事費</td><td>追加工事の合計（パック工事費に上乗せ）</td></tr>
+          <tr><td>予備費</td><td>工事費合計の指定%（想定外費用）</td></tr>
+          <tr><td>概算総額</td><td>お客様への提示金額</td></tr>
+        </table>
+      </div>
+
+      <div class="help-sec">
+        <h4>⑦ 保存・履歴機能の使い方</h4>
+        <ul>
+          <li><strong>💾 保存</strong>：入力内容に名前をつけて保存（最大30件）</li>
+          <li><strong>💾 上書き保存</strong>：現在開いているデータを上書き</li>
+          <li><strong>📋 別名保存</strong>：別の名前で新しく保存</li>
+          <li><strong>📂 履歴</strong>：保存済みデータの一覧を表示・読み込み・削除</li>
+          <li><strong>＋ 新規</strong>：入力内容をリセットして新規作成</li>
+        </ul>
+        <div class="help-warn">⚠ 保存データはブラウザ内に保存されます。ブラウザのキャッシュをクリアするとデータが消える場合があります。他のパソコンとは共有できません。</div>
+      </div>
+
+      <div class="help-sec">
+        <h4>⑧ 見積書の印刷・PDF保存</h4>
+        <ul>
+          <li>見積書画面で「🖨️ 印刷 / PDF保存」ボタンをクリック</li>
+          <li>プリンターを選択して印刷、またはPDFとして保存</li>
+          <li>PDFで保存する場合は「印刷先」を「PDFとして保存」に変更してください</li>
+        </ul>
+      </div>
+
+      <div class="help-sec">
+        <h4>⑨ 注意事項</h4>
+        <ul>
+          <li>本システムの金額はあくまで<strong>概算</strong>です。正式な金額は現地調査後にご提示ください</li>
+          <li>建物の状況によって追加工事が必要になる場合があります</li>
+          <li>マンションでは管理規約により工事内容が制限される場合があります</li>
+          <li>電気温水器・エコキュート使用のマンションは別途費用が発生します</li>
+          <li>浴室の広さが0.75坪または1.25坪の場合は別途お見積もりとなります</li>
+          <li>ガス工事およびアスベスト処分費は別途費用がかかります</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
 <!-- 保存ダイアログ -->
 <div class="modal-bg" id="saveDlg" style="display:none">
   <div class="modal">
@@ -965,6 +1106,7 @@ function deleteCase(id){
 }
 
 function closeDlg(id){ document.getElementById(id).style.display='none'; }
+function openHelp(){ document.getElementById('helpDlg').style.display='flex'; }
 
 // 初期化
 loadSavedCases();
