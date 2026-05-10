@@ -279,9 +279,8 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         <p>UB・キッチン・洗面台・トイレ・外壁塗装・屋根塗装の6項目のうち外した数に応じて以下の金額が加算されます。</p>
         <table class="help-tbl">
           <tr><th>外した点数</th><th>パック割引解消額</th></tr>
-          <tr><td>1点</td><td>+150,000円</td></tr>
-          <tr><td>2点</td><td>+350,000円</td></tr>
-          <tr><td>3点以上</td><td>+550,000円</td></tr>
+          <tr><td>1点</td><td>+100,000円</td></tr>
+          <tr><td>2点以上</td><td>+200,000円（一律）</td></tr>
         </table>
         <div class="help-warn">⚠ 足場設置費は外壁塗装・屋根塗装の両方を外した場合のみ外せます。片方でも残す場合は自動的に必須になります。</div>
       </div>
@@ -492,9 +491,8 @@ function calcPenalty(pack, penaltyIds){
     var el = document.getElementById('pk_'+id);
     if(el && !el.checked) offCount++;
   });
-  if(offCount === 1) return 150000;
-  if(offCount === 2) return 350000;
-  if(offCount >= 3) return 550000;
+  if(offCount === 1) return 100000;
+  if(offCount >= 2) return 200000;
   return 0;
 }
 function getPenaltyLabel(pack, penaltyIds){
@@ -503,9 +501,8 @@ function getPenaltyLabel(pack, penaltyIds){
     var el = document.getElementById('pk_'+id);
     if(el && !el.checked) offCount++;
   });
-  if(offCount === 1) return 'パック割引解消（1点外し）+15万円';
-  if(offCount === 2) return 'パック割引解消（2点外し）+35万円';
-  if(offCount >= 3) return 'パック割引解消（3点以上外し）+55万円';
+  if(offCount === 1) return 'パック割引解消（1点外し）+10万円';
+  if(offCount >= 2) return 'パック割引解消（2点以上外し）+20万円';
   return 'パック構成調整額';
 }
 var LOCKED_M = ['m01','m04','m08','m11','m13b','m21','m22','m23','m24'];
