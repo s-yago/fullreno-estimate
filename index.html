@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>フルリノベーション見積もりシステム</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -110,6 +110,56 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 .btn-load{background:#1a3a6b;color:#fff}
 .btn-del{background:#eee;color:#888;border:1px solid #ccc!important}
 .btn-del-confirm{background:#8b0000;color:#fff}
+@media(max-width:640px){
+  .est-btn-group{flex-direction:column}
+  body{padding:.5rem}
+  h1{font-size:13px;padding:.6rem .5rem}
+  /* タブ */
+  .tab{font-size:12px;padding:8px 4px}
+  /* 保存バー */
+  .save-bar{flex-direction:column;align-items:stretch}
+  .save-bar button{width:100%;text-align:center}
+  /* 基本情報 */
+  .base-info{grid-template-columns:1fr}
+  /* 面積入力 */
+  .area-box{flex-direction:column;align-items:flex-start;gap:8px}
+  .area-input-wrap input{width:100%;font-size:16px}
+  .area-note{font-size:11px;width:100%}
+  /* 2カラム→1カラム */
+  .two-col{grid-template-columns:1fr;gap:.75rem}
+  /* カード */
+  .card{padding:.75rem}
+  .card-title{font-size:11px}
+  /* 項目行 */
+  .item-label{font-size:11px}
+  .item-price{font-size:11px;min-width:80px}
+  /* 合計エリア */
+  .totals{padding:.75rem}
+  .total-row{font-size:12px}
+  .total-row.main{font-size:15px}
+  .total-row.adjust{font-size:11px}
+  /* ボタン */
+  .btn-estimate{font-size:14px;padding:12px}
+  /* 見積書ページのボタン群 */
+  .no-print[style*="display:flex"]{flex-direction:column}
+  /* モーダル */
+  .modal{width:95vw;padding:16px}
+  .help-modal{width:95vw;max-height:90vh}
+  .help-body{padding:12px}
+  .help-sec h4{font-size:12px}
+  .help-sec p,.help-sec li{font-size:11px}
+  .help-tbl{font-size:10px}
+  .help-tbl th,.help-tbl td{padding:4px 6px}
+  /* 履歴ダイアログ */
+  .modal[style*="width:480px"]{width:95vw!important}
+  .history-item-btns{flex-wrap:wrap}
+  .history-item-btns button{flex:1 1 40%}
+  /* 見積書テーブル */
+  .est-table{font-size:11px}
+  .est-table th,.est-table td{padding:4px 6px}
+  .est-total{font-size:24px}
+  .est-title{font-size:14px}
+}
 @media print{
   .btn-back,.btn-estimate,.btn-print,.no-print,.save-bar,.modal-bg{display:none!important}
   body{background:white;padding:0}
