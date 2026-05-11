@@ -660,9 +660,11 @@ function buildAddItems(){
       var priceHtml = d.freeInput
         ? '<input type="number" id="fi_'+d.id+'" value="0" min="0" onchange="recalc()" placeholder="金額入力" style="width:110px;font-size:12px;padding:3px 6px;border:1px solid #ddd;border-radius:4px;text-align:right"> 円'
         : '<span class="item-price price-grn">+' + fmt(d.price) + ' 円</span>';
+      var redIds = ['a09','a10','a11','a14m','a14k'];
+      var labelStyle = redIds.indexOf(d.id) !== -1 ? ' style="color:#A32D2D;font-weight:700"' : '';
       return '<div class="item-row">' +
         '<input type="checkbox" id="ad_'+d.id+'" onchange="recalc()">' +
-        '<label class="item-label" for="ad_'+d.id+'">' + d.label + '</label>' +
+        '<label class="item-label" for="ad_'+d.id+'"'+labelStyle+'>' + d.label + '</label>' +
         priceHtml + qtyHtml + '</div>';
     }).join('') + '</div>';
   }).join('');
