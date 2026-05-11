@@ -131,9 +131,10 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 
     <!-- 保存バー -->
     <div class="save-bar no-print" id="saveBar">
-      <button class="btn-save" onclick="openSaveDialog()">💾 保存</button>
-      <button class="btn-history" onclick="openHistory()">📂 履歴 (<span id="historyCount">0</span>)</button>
-      <button class="btn-new" onclick="newCase()">＋ 新規</button>
+      <button class="btn-history" onclick="openHistory()">📂 保存した見積もり一覧 (<span id="historyCount">0</span>件)</button>
+      <button class="btn-new" onclick="newCase()">＋ 新規作成</button>
+      <button style="padding:7px 14px;font-size:12px;font-weight:700;border:none;border-radius:6px;cursor:pointer;background:#555;color:#fff" onclick="document.getElementById('jsonImportInput').click()">📂 JSONから読み込む</button>
+      <input type="file" id="jsonImportInput" accept=".json" style="display:none" onchange="importJSON(event)">
     </div>
 
     <div class="base-info">
@@ -231,6 +232,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
     <div class="card" id="estimateHTML"></div>
     <div class="no-print" style="display:flex;gap:8px;margin-bottom:.5rem;flex-wrap:wrap">
       <button style="flex:1;padding:13px;background:#1a3a6b;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer" onclick="saveCurrentEstimate()">💾 この見積もりを保存する</button>
+      <button style="flex:1;padding:13px;background:#2e7d32;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer" onclick="exportJSON()">📤 JSONファイルとして送る</button>
       <button class="btn-print" style="flex:1;margin-bottom:0" onclick="window.print()">🖨️ 印刷 / PDF保存</button>
     </div>
     <button class="btn-back no-print" onclick="goBack()">← 入力画面に戻る</button>
@@ -485,6 +487,7 @@ var addData = [
     {id:'a16', label:'屋根塗装追加（70㎡超過分）', price:13000, qty:true, unit:'㎡'},
     {id:'a17', label:'カーポート設置（2台分・積雪1.5mタイプ）', price:1000000, qty:false},
     {id:'a19', label:'断熱玄関扉', price:650000, qty:false},
+    {id:'a20', label:'シロアリ防除費用（70㎡まで）', price:250000, qty:false},
   ]},
 ];
 
@@ -1143,6 +1146,71 @@ function deleteCase(id){
   persistSave();
   deleteConfirmId=null;
   renderHistory();
+}
+
+// ===== JSON エクスポート・インポート =====
+function exportJSON(){
+  var state = getState();
+  var customerName = state.customerName || 'お客様';
+  var dateStr = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  var typeStr = state.tab === 'mansion' ? 'マンション' : '戸建て';
+  var totalEl = document.getElementById('t-total');
+  var totalText = totalEl ? totalEl.textContent : '―';
+
+  var exportData = {
+    _type: 'fullreno_estimate',
+    _version: '1.0',
+    _exportedAt: new Date().toLocaleString('ja-JP'),
+    customerName: customerName,
+    address: state.address,
+    propertyType: typeStr,
+    totalText: totalText,
+    data: state
+  };
+
+  var json = JSON.stringify(exportData, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = dateStr + '_' + customerName + '様邸_' + typeStr + '_見積もり.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(event){
+  var file = event.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var obj = JSON.parse(e.target.result);
+      // 形式チェック
+      if(obj._type !== 'fullreno_estimate'){
+        alert('このファイルはフルリノベ見積もりシステム用のJSONではありません。');
+        return;
+      }
+      if(!obj.data){
+        alert('データが読み取れませんでした。');
+        return;
+      }
+      if(!confirm('「' + (obj.customerName||'お客様') + '」様の見積もりを読み込みます。現在の内容は上書きされます。よろしいですか？')){
+        return;
+      }
+      restoreState(obj.data);
+      document.getElementById('page-input').classList.add('active');
+      document.getElementById('page-estimate').classList.remove('active');
+      window.scrollTo(0,0);
+      alert('読み込み完了しました！\n' + (obj.customerName||'お客様') + '様邸（' + (obj.propertyType||'') + '）\n概算総額：' + (obj.totalText||'―'));
+    } catch(err){
+      alert('JSONファイルの読み込みに失敗しました。\n' + err.message);
+    }
+    // inputをリセット（同じファイルを再度読めるように）
+    event.target.value = '';
+  };
+  reader.readAsText(file, 'UTF-8');
 }
 
 function closeDlg(id){ document.getElementById(id).style.display='none'; }
