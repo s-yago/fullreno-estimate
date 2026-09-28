@@ -187,8 +187,8 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         </div>
         <div>
           <div class="area-note" id="areaNoteText">
-            基準面積：<strong>73㎡</strong>（930万円）<br>
-            1㎡増減につき <strong>±6万円</strong><br>
+            基準面積：<strong>73㎡</strong>（1,033万円）<br>
+            1㎡増減につき <strong>±6.9万円</strong><br>
             <span style="color:#e65100">61㎡以下は61㎡として計算</span>
           </div>
         </div>
@@ -302,8 +302,8 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         <h4>② 面積入力について</h4>
         <table class="help-tbl">
           <tr><th>種別</th><th>最低保証面積</th><th>基準面積・金額</th><th>増減単価</th></tr>
-          <tr><td>マンション</td><td>61㎡（858万円）</td><td>73㎡・930万円</td><td>±6万円/㎡</td></tr>
-          <tr><td>戸建て</td><td>85㎡（1,220万円）</td><td>105㎡・1,360万円</td><td>±7万円/㎡</td></tr>
+          <tr><td>マンション</td><td>61㎡（950万円）</td><td>73㎡・1,033万円</td><td>±6.9万円/㎡</td></tr>
+          <tr><td>戸建て</td><td>85㎡（1,367万円）</td><td>105㎡・1,528万円</td><td>±8万円/㎡</td></tr>
         </table>
         <p>※ 入力面積が最低保証面積を下回る場合は自動的に最低保証面積で計算されます。</p>
       </div>
@@ -814,11 +814,11 @@ function setTab(tab){
   document.querySelectorAll('.kodate-only').forEach(function(el){ el.style.display = isKodate?'':'none'; });
   if(isKodate){
     document.getElementById('areaLabel').textContent = '室内面積（㎡）';
-    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>105㎡</strong>（1,360万円）<br>1㎡増減につき <strong>±7万円</strong><br><span style="color:#e65100">85㎡以下は85㎡として計算</span>';
+    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>105㎡</strong>（1,528万円）<br>1㎡増減につき <strong>±8万円</strong><br><span style="color:#e65100">85㎡以下は85㎡として計算</span>';
     document.getElementById('areaInput').value = 105;
   } else {
     document.getElementById('areaLabel').textContent = '専有面積（㎡）';
-    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>73㎡</strong>（930万円）<br>1㎡増減につき <strong>±6万円</strong><br><span style="color:#e65100">61㎡以下は61㎡として計算</span>';
+    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>73㎡</strong>（1,033万円）<br>1㎡増減につき <strong>±6.9万円</strong><br><span style="color:#e65100">61㎡以下は61㎡として計算</span>';
     document.getElementById('areaInput').value = 73;
   }
   buildPackItems();
