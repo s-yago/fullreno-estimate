@@ -173,9 +173,10 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
       <input type="file" id="jsonImportInput" accept=".json" style="display:none" onchange="importJSON(event)">
     </div>
 
-    <div class="base-info">
+    <div class="base-info" style="grid-template-columns:1fr 1fr 1fr">
       <div class="field"><label>お客様名</label><input type="text" id="customerName" placeholder="例：山田 太郎"></div>
       <div class="field"><label>物件住所（任意）</label><input type="text" id="address" placeholder="例：富山市〇〇町1-2-3"></div>
+      <div class="field"><label>担当者名</label><input type="text" id="staffName" placeholder="例：矢郷 修治"></div>
     </div>
 
     <div class="card" style="margin-bottom:1rem">
@@ -524,12 +525,12 @@ var addData = [
     {id:'a07', label:'エアコン用コンセント新設', price:57000, qty:true, unit:'か所'},
     {id:'a08', label:'リビング床暖房設置工事', price:575000, qty:false},
     {id:'a09', label:'浴室乾燥暖房機（UB交換の場合）', price:230000, qty:false},
-    {id:'a10', label:'ビルトイン食洗機（キッチン交換の場合）', price:172000, qty:false},
+    {id:'a10', label:'ビルトイン食洗機（キッチン交換の場合）', price:172500, qty:false},
     {id:'a11', label:'キッチンIHコンロ設置', price:69000, qty:false},
     {id:'a12', label:'キッチン吊戸棚', price:92000, qty:false},
     {id:'a13', label:'キッチンキャビネット（W1800タイプ）', price:402000, qty:false},
     {id:'a14m', label:'エコキュート（370L）設置（ガス給湯機工事費に加算）', price:345000, qty:false, mansionOnly:true},
-    {id:'a14k', label:'エコキュート（370L）設置（ガス給湯機工事費に加算）', price:305000, qty:false, kodateOnly:true},
+    {id:'a14k', label:'エコキュート（370L）設置（ガス給湯機工事費に加算）', price:345000, qty:false, kodateOnly:true},
     {id:'a15', label:'玄関土間収納（10㎡まで）', price:575000, qty:false},
     {id:'a16', label:'入口ドア追加', price:69000, qty:true, unit:'か所'},
     {id:'a17', label:'収納2枚折れ戸', price:57000, qty:true, unit:'か所'},
@@ -837,6 +838,10 @@ function goBack(){
 
 function goToEstimate(){
   var name = document.getElementById('customerName').value || 'お客様';
+  var staffName = (document.getElementById('staffName') && document.getElementById('staffName').value) || '―';
+  var expDate = new Date();
+  expDate.setMonth(expDate.getMonth() + 3);
+  var expStr = expDate.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
   var addr = document.getElementById('address').value;
   var today = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'});
   var isKodate = currentTab==='kodate';
@@ -930,7 +935,8 @@ function goToEstimate(){
 
   var notes = '<p>本見積もりは概算金額です。現地調査後に正式見積もりを提出いたします。</p>' +
     '<p>建物の状況によって追加工事が必要になる場合があります。</p>' +
-    '<p>電気温水器・エコキュート（370ℓ）使用の場合、約30万円の追加費用が発生します。</p>';
+    '<p>電気温水器・エコキュート（370ℓ）使用の場合、約30万円の追加費用が発生します。</p>' +
+    '<p>床工事：既存床が絨毯・カーペット等の場合、下地調整費が別途必要になることがあります。</p>';
   if(!isKodate) notes += '<p>マンションでのフローリング張替は、管理規約によりLL-45等級以上の防音フローリングが義務付けられている場合があり、別途費用がかかる場合があります。</p>';
   if(isKodate){
     var wallArea = Math.round(getFloorArea() * 1.3);
@@ -948,9 +954,19 @@ function goToEstimate(){
     '<div style="padding:1rem">' +
     warnHtml +
     '<div class="est-header">' +
-    '<div class="est-title">' + name + ' 様邸（' + type + '）フルリノベーション 概算お見積もり</div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;text-align:left;margin-bottom:12px">' +
+    '<div>' +
+    '<div class="est-title" style="text-align:left">' + name + ' 様邸（' + type + '）<br>フルリノベーション 概算お見積もり</div>' +
     (addr?'<div style="font-size:12px;color:#888;margin-top:4px">'+addr+'</div>':'') +
-    '<div style="font-size:12px;color:#888;margin-top:4px">' + areaInfo + '　｜　見積日：' + today + '</div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:#555;line-height:1.7;text-align:right">' +
+    '<div style="font-size:14px;font-weight:700;color:#2e7d32">ViVi不動産株式会社</div>' +
+    '<div>〒930-0885 富山市天正寺1076</div>' +
+    '<div>フリーダイヤル：0120-145-151</div>' +
+    '<div>担当：' + staffName + '</div>' +
+    '</div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:#888;margin-top:4px">' + areaInfo + '　｜　見積日：' + today + '　｜　有効期限：' + expStr + 'まで</div>' +
     '<div class="est-total">' + fmt(total) + ' 円（税込）</div>' +
     '<div style="font-size:12px;color:#666">※ 概算金額です。正式金額は現地調査後にご提示いたします。</div>' +
     '</div>' +
@@ -1033,6 +1049,7 @@ function getState(){
     tab: currentTab,
     customerName: document.getElementById('customerName').value,
     address: document.getElementById('address').value,
+    staffName: (document.getElementById('staffName') && document.getElementById('staffName').value) || '',
     area: document.getElementById('areaInput').value,
     floorArea: document.getElementById('floorAreaInput').value,
     bufRate: document.getElementById('bufRate').value,
@@ -1048,6 +1065,7 @@ function restoreState(state){
   setTab(state.tab||'mansion');
   document.getElementById('customerName').value = state.customerName||'';
   document.getElementById('address').value = state.address||'';
+  if(document.getElementById('staffName')) document.getElementById('staffName').value = state.staffName||'';
   document.getElementById('areaInput').value = state.area||73;
   document.getElementById('floorAreaInput').value = state.floorArea||105;
   document.getElementById('bufRate').value = state.bufRate||30;
@@ -1118,6 +1136,7 @@ function newCase(){
   if(!confirm('現在の内容をクリアして新規作成しますか？')) return;
   document.getElementById('customerName').value='';
   document.getElementById('address').value='';
+  if(document.getElementById('staffName')) document.getElementById('staffName').value='';
   document.getElementById('areaInput').value=73;
   document.getElementById('floorAreaInput').value=105;
   document.getElementById('bufRate').value=30;
