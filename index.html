@@ -187,7 +187,7 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         </div>
         <div>
           <div class="area-note" id="areaNoteText">
-            基準面積：<strong>73㎡</strong>（1,033万円）<br>
+            基準面積：<strong>73㎡</strong>（1,063万円）<br>
             1㎡増減につき <strong>±6.9万円</strong><br>
             <span style="color:#e65100">61㎡以下は61㎡として計算</span>
           </div>
@@ -302,8 +302,8 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
         <h4>② 面積入力について</h4>
         <table class="help-tbl">
           <tr><th>種別</th><th>最低保証面積</th><th>基準面積・金額</th><th>増減単価</th></tr>
-          <tr><td>マンション</td><td>61㎡（950万円）</td><td>73㎡・1,033万円</td><td>±6.9万円/㎡</td></tr>
-          <tr><td>戸建て</td><td>85㎡（1,367万円）</td><td>105㎡・1,528万円</td><td>±8万円/㎡</td></tr>
+          <tr><td>マンション</td><td>61㎡（980万円）</td><td>73㎡・1,063万円</td><td>±6.9万円/㎡</td></tr>
+          <tr><td>戸建て</td><td>85㎡（1,405万円）</td><td>105㎡・1,566万円</td><td>±8万円/㎡</td></tr>
         </table>
         <p>※ 入力面積が最低保証面積を下回る場合は自動的に最低保証面積で計算されます。</p>
       </div>
@@ -433,8 +433,8 @@ h1{font-size:16px;font-weight:700;margin-bottom:1rem;color:#2e7d32;text-align:ce
 var currentTab = 'mansion';
 
 // ===== 基準値 =====
-var M_BASE_AREA = 73, M_MIN_AREA = 61, M_MIN_TOTAL = 9500000, M_BASE_TOTAL = 10330000, M_UNIT = 69000;
-var K_BASE_AREA = 105, K_MIN_AREA = 85, K_MIN_TOTAL = 13670000, K_BASE_TOTAL = 15280000, K_UNIT = 80000;
+var M_BASE_AREA = 73, M_MIN_AREA = 61, M_MIN_TOTAL = 9800000, M_BASE_TOTAL = 10630000, M_UNIT = 69000;
+var K_BASE_AREA = 105, K_MIN_AREA = 85, K_MIN_TOTAL = 14050000, K_BASE_TOTAL = 15660000, K_UNIT = 80000;
 
 // ===== マンション パック工事 =====
 // type: fix=固定, var_sqm=㎡変動, var_5sqm=5㎡変動
@@ -445,7 +445,7 @@ var mansionPack = [
   {id:'m03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'m04', label:'UB・システムキッチン搬入費用', type:'fix', base:164000, deduct:164000, locked:true},
   {id:'m05', label:'洗面台新規設置工事（タカラスタンダード・リフレシオ）', type:'fix', base:166000, deduct:166000, locked:false},
-  {id:'m06', label:'トイレ新規設置工事（TOTO・ウォシュレットZR-1）', type:'fix', base:209000, deduct:209000, locked:false},
+  {id:'m06', label:'トイレ新規設置工事（TOTO・ウォシュレットZR-1）', type:'fix', base:221000, deduct:221000, locked:false},
   {id:'m07', label:'ガス給湯機（20号）工事', type:'fix', base:230000, deduct:230000, locked:false},
   {id:'m08', label:'給排水・ガス配管工事（洗濯水栓交換含む）', type:'var_sqm', base:460000, deduct:460000, baseArea:73, unit:7000, unitDeduct:7000, locked:true},
   {id:'m09', label:'全室フロアタイル床上貼り工事', type:'var_sqm', base:949000, deduct:949000, baseArea:73, unit:13000, unitDeduct:13000, locked:false},
@@ -462,8 +462,8 @@ var mansionPack = [
   {id:'m16', label:'ふすま張替（仏間戸除く。6面まで）・障子張替', type:'fix', base:80000, deduct:80000, locked:false},
   {id:'m17', label:'全室網戸貼替', type:'var_5sqm', base:75000, deduct:75000, baseArea:73, unit:6000, unitDeduct:6000, locked:false},
   {id:'m18', label:'カギ交換（上下2か所）', type:'fix', base:92000, deduct:92000, locked:false},
-  {id:'m19', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:598000, deduct:598000, locked:false},
-  {id:'m20', label:'ペアガラス内窓設置（4か所）', type:'fix', base:460000, deduct:460000, locked:false},
+  {id:'m19', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:815000, deduct:815000, locked:false},
+  {id:'m20', label:'ペアガラス内窓設置（4か所）', type:'fix', base:530500, deduct:530500, locked:false},
   {id:'m21', label:'ハウスクリーニング', type:'var_sqm', base:129000, deduct:129000, baseArea:73, unit:1000, unitDeduct:1000, locked:true},
   {id:'m22', label:'養生費', type:'fix', base:64000, deduct:64000, locked:true},
   {id:'m23', label:'資材運搬費', type:'fix', base:80000, deduct:80000, locked:true},
@@ -477,8 +477,8 @@ var kodatePack = [
   {id:'k02', label:'ユニットバス新規設置工事（タカラスタンダード・リラクシア）', type:'fix', base:1027000, deduct:1027000, locked:false},
   {id:'k03', label:'システムキッチン新規設置工事（タカラスタンダード・グレーシア）', type:'fix', base:774200, deduct:774200, locked:false},
   {id:'k04', label:'洗面台新規設置工事（タカラスタンダード・リフレシオ）', type:'fix', base:166000, deduct:166000, locked:false},
-  {id:'k05', label:'トイレ新規設置工事 1階（TOTO・ウォシュレットZR-1）', type:'fix', base:209000, deduct:209000, locked:false},
-  {id:'k05b', label:'トイレ新規設置工事 2階（TOTO・ウォシュレットZR-1）', type:'fix', base:209000, deduct:209000, locked:false},
+  {id:'k05', label:'トイレ新規設置工事 1階（TOTO・ウォシュレットZR-1）', type:'fix', base:221000, deduct:221000, locked:false},
+  {id:'k05b', label:'トイレ新規設置工事 2階（TOTO・ウォシュレットZR-1）', type:'fix', base:221000, deduct:221000, locked:false},
   {id:'k13a', label:'1階トイレCF床張り替え', type:'fix', base:41000, deduct:41000, locked:false},
   {id:'k05c', label:'2階トイレCF床張り替え', type:'fix', base:41000, deduct:41000, locked:false},
   {id:'k06', label:'ガス給湯機（24号）工事', type:'fix', base:195000, deduct:195000, locked:false},
@@ -496,8 +496,8 @@ var kodatePack = [
   {id:'k15', label:'ふすま張替（仏間戸除く。6面まで）・障子張替', type:'fix', base:80000, deduct:80000, locked:false},
   {id:'k16', label:'全室網戸貼替', type:'var_5sqm', base:75000, deduct:75000, baseArea:105, unit:6000, unitDeduct:6000, locked:false},
   {id:'k17', label:'カギ交換（上下2か所）', type:'fix', base:92000, deduct:92000, locked:false},
-  {id:'k18', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:656000, deduct:656000, locked:false},
-  {id:'k19', label:'ペアガラス内窓設置（8か所）', type:'fix', base:897000, deduct:897000, locked:false},
+  {id:'k18', label:'エアコン設置（LDK16帖1か所、洋室6帖2か所）', type:'fix', base:873000, deduct:873000, locked:false},
+  {id:'k19', label:'ペアガラス内窓設置（8か所）', type:'fix', base:1038000, deduct:1038000, locked:false},
   {id:'k20', label:'ハウスクリーニング', type:'var_sqm', base:159000, deduct:159000, baseArea:105, unit:1000, unitDeduct:1000, locked:true},
   {id:'k21', label:'外壁塗装工事（200㎡まで）', type:'fix', base:1420000, deduct:1420000, locked:false},
   {id:'k22', label:'屋根塗装工事・スレート葺き（70㎡まで）', type:'fix', base:460000, deduct:460000, locked:false},
@@ -511,7 +511,11 @@ var kodatePack = [
 // ===== 追加工事 =====
 var addData = [
   {group:'マンション・戸建て共通', items:[
-    {id:'a01', label:'6帖エアコン設置工事（追加）', price:155000, qty:true, unit:'か所'},
+    {id:'a01', label:'6帖エアコン設置工事（追加）', price:220000, qty:true, unit:'か所'},
+    {id:'a01b', label:'10帖エアコン設置工事（追加）', price:367000, qty:true, unit:'か所'},
+    {id:'a01c', label:'18帖エアコン設置工事（追加）', price:660000, qty:true, unit:'か所'},
+    {id:'a22', label:'トイレ追加設置（TOTO・ウォシュレットZR-1）', price:221000, qty:true, unit:'か所'},
+    {id:'a23', label:'ペアガラス内窓追加設置', price:133000, qty:true, unit:'か所'},
     {id:'a02', label:'畳表替え工事（追加）', price:12000, qty:true, unit:'帖'},
     {id:'a03', label:'ふすま張替工事（追加）', price:11000, qty:true, unit:'面'},
     {id:'a04', label:'カギ交換（追加）', price:34000, qty:true, unit:'か所'},
@@ -814,11 +818,11 @@ function setTab(tab){
   document.querySelectorAll('.kodate-only').forEach(function(el){ el.style.display = isKodate?'':'none'; });
   if(isKodate){
     document.getElementById('areaLabel').textContent = '室内面積（㎡）';
-    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>105㎡</strong>（1,528万円）<br>1㎡増減につき <strong>±8万円</strong><br><span style="color:#e65100">85㎡以下は85㎡として計算</span>';
+    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>105㎡</strong>（1,566万円）<br>1㎡増減につき <strong>±8万円</strong><br><span style="color:#e65100">85㎡以下は85㎡として計算</span>';
     document.getElementById('areaInput').value = 105;
   } else {
     document.getElementById('areaLabel').textContent = '専有面積（㎡）';
-    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>73㎡</strong>（1,033万円）<br>1㎡増減につき <strong>±6.9万円</strong><br><span style="color:#e65100">61㎡以下は61㎡として計算</span>';
+    document.getElementById('areaNoteText').innerHTML = '基準面積：<strong>73㎡</strong>（1,063万円）<br>1㎡増減につき <strong>±6.9万円</strong><br><span style="color:#e65100">61㎡以下は61㎡として計算</span>';
     document.getElementById('areaInput').value = 73;
   }
   buildPackItems();
